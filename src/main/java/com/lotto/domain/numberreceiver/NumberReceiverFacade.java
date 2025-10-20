@@ -1,15 +1,5 @@
 package com.lotto.domain.numberreceiver;
 
-/*
-Użytkownik podaje 6 liczb.
-Liczby muszą być w zakresie od 1 do 99.
-Liczby nie mogą się powtarzać.
-Po poprawnym wysłaniu liczb użytkownik otrzymuje:
-    informację, że liczby są poprawne,
-    unikalny identyfikator losowania (userLotteryId),
-    date losowania
-*/
-
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
