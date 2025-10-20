@@ -1,7 +1,10 @@
 package com.lotto.domain.numberreceiver;
 
+import lombok.Builder;
+
 import java.time.LocalDateTime;
 import java.util.Set;
 
-public record Ticket(String ticketId, LocalDateTime drowDate, Set<Integer> numbersFromUser) {
+@Builder
+record Ticket(String hash, Set<Integer> numbers, LocalDateTime drawDate) {
 }
