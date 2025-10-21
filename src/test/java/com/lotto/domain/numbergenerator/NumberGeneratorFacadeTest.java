@@ -1,11 +1,119 @@
 package com.lotto.domain.numbergenerator;
 
+import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
+import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.junit.jupiter.api.Test;
+
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class NumberGeneratorFacadeTest {
 
-    @Test
-    public void f() {
+    private final WinningNumbersRepository winningNumbersRepository = new InMemoryWinningNumbersRepositoryTestImpl();
+    NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
+
+    NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
+            new NumberGeneratorTestImp(),
+            numberReceiverFacade,
+            winningNumbersRepository
+    );
+
+
+    @Test
+    void should_return_six_numbers() {
+        // given
+        LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
+        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        // when
+        WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
+        // then
+        assertThat(generatedNumbers.winningNumbers()).hasSize(6);
+        assertThat(generatedNumbers.winningNumbers()).containsExactlyInAnyOrder(1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    void should_return_six_random_numbers() {
+        // given
+        LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
+        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        // when
+        NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
+                new RandomGenerator(),
+                numberReceiverFacade,
+                winningNumbersRepository
+        );
+        WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
+        // then
+        assertThat(generatedNumbers.winningNumbers()).hasSize(6);
+    }
+
+
+    @Test
+    public void it_should_throw_an_exception_when_number_not_in_range() {
+        //given
+        Set<Integer> numbersOutOfRange = Set.of(1, 2, 3, 4, 5, 100);
+        RandomNumberGenerable generator = new NumberGeneratorTestImp(numbersOutOfRange);
+        InMemoryWinningNumbersRepositoryTestImpl repositoryTest = new InMemoryWinningNumbersRepositoryTestImpl();
+        //when
+        //then
+        NumberGeneratorFacade numbersGenerator = NumberGeneratorConfiguration.numberGeneratorFacade(generator, numberReceiverFacade, repositoryTest);
+        assertThrows(IllegalStateException.class, numbersGenerator::generateWinningNumbers, "Number out of range!");
+    }
+
+    @Test
+    public void it_should_return_win_number_when_number_in_range() {
+        // given
+        LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
+        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        // when
+        WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
+        //then
+        assertThat(generatedNumbers.winningNumbers())
+                .containsExactlyInAnyOrder(1, 2, 3, 4, 5, 6);
+    }
+
+    @Test
+    public void it_should_return_win_number_by_date() {
+        // given
+        LocalDateTime dateTime = LocalDateTime.of(2025, 10, 25, 12, 0);
+        InMemoryWinningNumbersRepositoryTestImpl repo = new InMemoryWinningNumbersRepositoryTestImpl();
+        WinningNumbers winningNumbers = new WinningNumbers(null, Set.of(10, 20, 30, 40, 50, 60), dateTime);
+        repo.save(winningNumbers);
+
+        RandomNumberGenerable generator = new NumberGeneratorTestImp();
+        NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
+                generator,
+                numberReceiverFacade,
+                repo
+        );
+        // when
+        WinningNumbersDto dto = facade.retrieveWinningNumberByDate(dateTime);
+        // then
+        assertThat(dto.date()).isEqualTo(dateTime);
+        assertThat(dto.winningNumbers()).containsExactlyInAnyOrder(10, 20, 30, 40, 50, 60);
+    }
+
+    @Test
+    void it_should_throw_an_exception_when_by_data_not_winners_numbers() {
+        // given
+        LocalDateTime dateTime = LocalDateTime.of(2025, 10, 25, 12, 0);
+
+        InMemoryWinningNumbersRepositoryTestImpl repo = new InMemoryWinningNumbersRepositoryTestImpl();
+
+        NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
+        RandomNumberGenerable generator = new NumberGeneratorTestImp(Set.of(1, 2, 3, 4, 5, 6));
+        // when / then
+        NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
+                generator,
+                numberReceiverFacade,
+                repo
+        );
+        assertThrows(WinningNumbersNotFoundException.class, () -> facade.retrieveWinningNumberByDate(dateTime));
     }
 }

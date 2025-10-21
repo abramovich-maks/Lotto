@@ -110,4 +110,14 @@ class NumberReceiverFacadeTest {
         assertThat(tickets).extracting(TicketDto::hash)
                 .containsExactly(r1.ticketDto().hash(), r2.ticketDto().hash());
     }
+
+    @Test
+    public void it_should_return_next_draw_date() {
+        // given
+        // when
+        LocalDateTime testedDrawDate = numberReceiverFacade.retrieveNextDrawDate();
+        // then
+        LocalDateTime expectedDrawDate = LocalDateTime.of(2025, 10, 25, 12, 0, 0);
+        assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
 }
