@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
-class ResultCheckerFacade {
+public class ResultCheckerFacade {
 
     private final NumberReceiverFacade numberReceiver;
     private final NumberGeneratorFacade numberGenerator;
