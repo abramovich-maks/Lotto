@@ -1,7 +1,6 @@
 package com.lotto.domain.numbergenerator;
 
 import com.lotto.domain.drowdate.DrawDateFacade;
-import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 
 class NumberGeneratorConfiguration {
 

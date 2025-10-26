@@ -12,13 +12,14 @@ import java.util.Set;
 public class NumberGeneratorFacade {
 
     private final DrawDateFacade drawDateFacade;
-    private final RandomNumberGenerable randomGenerator;
+    private final RandomNumberGenerable randomGenerable;
     private final WinningNumbersRepository winningNumbersRepository;
     private WinningNumberValidator winningNumberValidator;
 
     public WinningNumbersDto generateWinningNumbers() {
         LocalDateTime nextDrawDate = drawDateFacade.getNextDrawDate();
-        Set<Integer> winningNumbers = randomGenerator.generateSixRandomNumbers();
+        SixRandomNumbersDto dto = randomGenerable.generateSixRandomNumbers();
+        Set<Integer> winningNumbers = dto.numbers();
         winningNumberValidator.validate(winningNumbers);
         winningNumbersRepository.save(WinningNumbers.builder()
                 .winningNumbers(winningNumbers)

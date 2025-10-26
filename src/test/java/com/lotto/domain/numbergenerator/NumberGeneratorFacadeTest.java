@@ -44,7 +44,7 @@ class NumberGeneratorFacadeTest {
         when(drawDateFacade.getNextDrawDate()).thenReturn(drawDate);
         // when
         NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
-                new RandomGenerator(),
+                new NumberGeneratorTestImp(),
                 drawDateFacade,
                 winningNumbersRepository
         );
