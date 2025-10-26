@@ -1,4 +1,4 @@
-package com.lotto.domain.numberreceiver;
+package com.lotto.domain.drowdate;
 
 import java.time.Clock;
 import java.time.DayOfWeek;
@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 
-class DrawDateGenerator {
+class DrawDateGenerator implements DrawDateGenerable{
 
 
     private static final LocalTime DRAW_TIME = LocalTime.of(12, 0, 0);

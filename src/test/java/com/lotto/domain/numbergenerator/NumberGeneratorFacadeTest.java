@@ -55,7 +55,7 @@ class NumberGeneratorFacadeTest {
 
 
     @Test
-    public void it_should_throw_an_exception_when_number_not_in_range() {
+    public void should_throw_an_exception_when_number_not_in_range() {
         //given
         Set<Integer> numbersOutOfRange = Set.of(1, 2, 3, 4, 5, 100);
         RandomNumberGenerable generator = new NumberGeneratorTestImp(numbersOutOfRange);
@@ -67,7 +67,7 @@ class NumberGeneratorFacadeTest {
     }
 
     @Test
-    public void it_should_return_win_number_when_number_in_range() {
+    public void should_return_win_number_when_number_in_range() {
         // given
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
         when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
@@ -79,7 +79,7 @@ class NumberGeneratorFacadeTest {
     }
 
     @Test
-    public void it_should_return_win_number_by_date() {
+    public void should_return_win_number_by_date() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 10, 25, 12, 0);
         InMemoryWinningNumbersRepositoryTestImpl repo = new InMemoryWinningNumbersRepositoryTestImpl();
@@ -100,7 +100,7 @@ class NumberGeneratorFacadeTest {
     }
 
     @Test
-    void it_should_throw_an_exception_when_by_data_not_winners_numbers() {
+    void should_throw_an_exception_when_by_data_not_winners_numbers() {
         // given
         LocalDateTime dateTime = LocalDateTime.of(2025, 10, 25, 12, 0);
 
