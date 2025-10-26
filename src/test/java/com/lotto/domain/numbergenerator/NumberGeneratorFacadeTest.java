@@ -1,7 +1,7 @@
 package com.lotto.domain.numbergenerator;
 
+import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
-import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -15,12 +15,12 @@ import static org.mockito.Mockito.when;
 class NumberGeneratorFacadeTest {
 
     private final WinningNumbersRepository winningNumbersRepository = new InMemoryWinningNumbersRepositoryTestImpl();
-    NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
+    DrawDateFacade drawDateFacade = mock(DrawDateFacade.class);
 
 
     NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
             new NumberGeneratorTestImp(),
-            numberReceiverFacade,
+            drawDateFacade,
             winningNumbersRepository
     );
 
@@ -29,7 +29,7 @@ class NumberGeneratorFacadeTest {
     void should_return_six_numbers() {
         // given
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
-        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        when(drawDateFacade.getNextDrawDate()).thenReturn(drawDate);
         // when
         WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
         // then
@@ -41,11 +41,11 @@ class NumberGeneratorFacadeTest {
     void should_return_six_random_numbers() {
         // given
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
-        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        when(drawDateFacade.getNextDrawDate()).thenReturn(drawDate);
         // when
         NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
                 new RandomGenerator(),
-                numberReceiverFacade,
+                drawDateFacade,
                 winningNumbersRepository
         );
         WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
@@ -62,7 +62,7 @@ class NumberGeneratorFacadeTest {
         InMemoryWinningNumbersRepositoryTestImpl repositoryTest = new InMemoryWinningNumbersRepositoryTestImpl();
         //when
         //then
-        NumberGeneratorFacade numbersGenerator = NumberGeneratorConfiguration.numberGeneratorFacade(generator, numberReceiverFacade, repositoryTest);
+        NumberGeneratorFacade numbersGenerator = NumberGeneratorConfiguration.numberGeneratorFacade(generator, drawDateFacade, repositoryTest);
         assertThrows(IllegalStateException.class, numbersGenerator::generateWinningNumbers, "Number out of range!");
     }
 
@@ -70,7 +70,7 @@ class NumberGeneratorFacadeTest {
     public void should_return_win_number_when_number_in_range() {
         // given
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
-        when(numberReceiverFacade.retrieveNextDrawDate()).thenReturn(drawDate);
+        when(drawDateFacade.getNextDrawDate()).thenReturn(drawDate);
         // when
         WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
         //then
@@ -89,7 +89,7 @@ class NumberGeneratorFacadeTest {
         RandomNumberGenerable generator = new NumberGeneratorTestImp();
         NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
                 generator,
-                numberReceiverFacade,
+                drawDateFacade,
                 repo
         );
         // when
@@ -106,12 +106,11 @@ class NumberGeneratorFacadeTest {
 
         InMemoryWinningNumbersRepositoryTestImpl repo = new InMemoryWinningNumbersRepositoryTestImpl();
 
-        NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
         RandomNumberGenerable generator = new NumberGeneratorTestImp(Set.of(1, 2, 3, 4, 5, 6));
         // when / then
         NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
                 generator,
-                numberReceiverFacade,
+                drawDateFacade,
                 repo
         );
         assertThrows(WinningNumbersNotFoundException.class, () -> facade.retrieveWinningNumberByDate(dateTime));
