@@ -1,14 +1,14 @@
 package com.lotto.domain.numberreceiver;
 
-import java.time.Clock;
+
+import com.lotto.domain.drowdate.DrawDateFacade;
 
 class NumberReceiverConfiguration {
 
     public static NumberReceiverFacade numberReceiverFacade(final TicketRepository repository,
-                                                            final Clock clock,
+                                                            final DrawDateFacade drawDateFacade,
                                                             final HashGenerable hashGenerator) {
         NumberValidator validator = new NumberValidator();
-        DrawDateGenerator drawDateGenerator = new DrawDateGenerator(clock);
-        return new NumberReceiverFacade(validator, drawDateGenerator, hashGenerator, repository);
+        return new NumberReceiverFacade(validator, hashGenerator, repository, drawDateFacade);
     }
 }

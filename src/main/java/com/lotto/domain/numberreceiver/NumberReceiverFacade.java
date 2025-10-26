@@ -1,5 +1,6 @@
 package com.lotto.domain.numberreceiver;
 
+import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
@@ -13,9 +14,9 @@ import java.util.Set;
 public class NumberReceiverFacade {
 
     private final NumberValidator validator;
-    private final DrawDateGenerator drawDateGenerator;
     private final HashGenerable hashGenerator;
     private final TicketRepository repository;
+    private final DrawDateFacade drawDateFacade;
 
     public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
         boolean areAllNumbersInRange = validator.areAllNumbersInRange(numbersFromUser);
@@ -25,7 +26,7 @@ public class NumberReceiverFacade {
                     .build();
         }
         String hashTicket = hashGenerator.getHash();
-        LocalDateTime drawDate = drawDateGenerator.getNextDrawDate();
+        LocalDateTime drawDate = drawDateFacade.getNextDrawDate();
         Ticket savedTicket = repository.save(new Ticket(hashTicket, numbersFromUser, drawDate));
         return InputNumberResultDto.builder()
                 .ticketDto(TicketMapper.mapFromTicket(savedTicket))
@@ -34,7 +35,7 @@ public class NumberReceiverFacade {
     }
 
     public List<TicketDto> retrieveAllTicketsByDrawDate(LocalDateTime date) {
-        LocalDateTime nextDrawDate = drawDateGenerator.getNextDrawDate();
+        LocalDateTime nextDrawDate = drawDateFacade.getNextDrawDate();
         if (date.isAfter(nextDrawDate)) {
             return Collections.emptyList();
         }
@@ -45,6 +46,6 @@ public class NumberReceiverFacade {
     }
 
     public LocalDateTime retrieveNextDrawDate() {
-        return drawDateGenerator.getNextDrawDate();
+        return drawDateFacade.getNextDrawDate();
     }
 }
