@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DrawDateFacade {
 
-    private final DrawDateGenerator drawDateGenerator;
+    private final DrawDateGenerable drawDateGenerator;
 
     public LocalDateTime getNextDrawDate() {
         return drawDateGenerator.getNextDrawDate();

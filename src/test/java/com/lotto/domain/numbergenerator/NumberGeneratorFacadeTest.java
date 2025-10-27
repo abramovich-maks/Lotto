@@ -17,8 +17,7 @@ class NumberGeneratorFacadeTest {
     private final WinningNumbersRepository winningNumbersRepository = new InMemoryWinningNumbersRepositoryTestImpl();
     DrawDateFacade drawDateFacade = mock(DrawDateFacade.class);
 
-
-    NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
+    NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
             new NumberGeneratorTestImp(),
             drawDateFacade,
             winningNumbersRepository
@@ -43,7 +42,7 @@ class NumberGeneratorFacadeTest {
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
         when(drawDateFacade.getNextDrawDate()).thenReturn(drawDate);
         // when
-        NumberGeneratorFacade numberGeneratorFacade = NumberGeneratorConfiguration.numberGeneratorFacade(
+        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 new NumberGeneratorTestImp(),
                 drawDateFacade,
                 winningNumbersRepository
@@ -62,8 +61,12 @@ class NumberGeneratorFacadeTest {
         InMemoryWinningNumbersRepositoryTestImpl repositoryTest = new InMemoryWinningNumbersRepositoryTestImpl();
         //when
         //then
-        NumberGeneratorFacade numbersGenerator = NumberGeneratorConfiguration.numberGeneratorFacade(generator, drawDateFacade, repositoryTest);
-        assertThrows(IllegalStateException.class, numbersGenerator::generateWinningNumbers, "Number out of range!");
+        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
+                generator,
+                drawDateFacade,
+                repositoryTest
+        );
+        assertThrows(IllegalStateException.class, numberGeneratorFacade::generateWinningNumbers, "Number out of range!");
     }
 
     @Test
@@ -87,13 +90,13 @@ class NumberGeneratorFacadeTest {
         repo.save(winningNumbers);
 
         RandomNumberGenerable generator = new NumberGeneratorTestImp();
-        NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
+        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 generator,
                 drawDateFacade,
                 repo
         );
         // when
-        WinningNumbersDto dto = facade.retrieveWinningNumberByDate(dateTime);
+        WinningNumbersDto dto = numberGeneratorFacade.retrieveWinningNumberByDate(dateTime);
         // then
         assertThat(dto.date()).isEqualTo(dateTime);
         assertThat(dto.winningNumbers()).containsExactlyInAnyOrder(10, 20, 30, 40, 50, 60);
@@ -108,11 +111,11 @@ class NumberGeneratorFacadeTest {
 
         RandomNumberGenerable generator = new NumberGeneratorTestImp(Set.of(1, 2, 3, 4, 5, 6));
         // when / then
-        NumberGeneratorFacade facade = NumberGeneratorConfiguration.numberGeneratorFacade(
+        NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 generator,
                 drawDateFacade,
                 repo
         );
-        assertThrows(WinningNumbersNotFoundException.class, () -> facade.retrieveWinningNumberByDate(dateTime));
+        assertThrows(WinningNumbersNotFoundException.class, () -> numberGeneratorFacade.retrieveWinningNumberByDate(dateTime));
     }
 }

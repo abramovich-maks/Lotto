@@ -15,7 +15,7 @@ class NumberGeneratorTestImp implements RandomNumberGenerable {
     }
 
     @Override
-    public SixRandomNumbersDto generateSixRandomNumbers() {
+    public SixRandomNumbersDto generateSixRandomNumbers(final int lowerBand, final int upperBound, final int count) {
         return SixRandomNumbersDto.builder()
                 .numbers(generatedNumbers)
                 .build();
