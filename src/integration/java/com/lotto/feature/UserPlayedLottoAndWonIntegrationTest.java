@@ -26,7 +26,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                                 """.trim()
                         )));
         // when
-        SixRandomNumbersDto sixRandomNumbersDto = randomNumberGenerable.generateSixRandomNumbers();
+        SixRandomNumbersDto sixRandomNumbersDto = randomNumberGenerable.generateSixRandomNumbers(1, 99, 25);
         // then
 
 
