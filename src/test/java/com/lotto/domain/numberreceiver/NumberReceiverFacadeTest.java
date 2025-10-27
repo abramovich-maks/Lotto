@@ -18,7 +18,7 @@ class NumberReceiverFacadeTest {
     DrawDateFacade drawDateFacade = mock(DrawDateFacade.class);
 
 
-    NumberReceiverFacade numberReceiverFacade = NumberReceiverConfiguration.numberReceiverFacade(
+    NumberReceiverFacade numberReceiverFacade = new NumberReceiverConfiguration().numberReceiverFacade(
             new InMemoryTicketRepositoryTestImpl(),
             drawDateFacade,
             new HashGenerator()
