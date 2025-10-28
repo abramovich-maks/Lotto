@@ -11,6 +11,4 @@ interface WinningNumbersRepository extends MongoRepository<WinningNumbers, Strin
 
     Optional<WinningNumbers> findNumbersByDate(LocalDateTime date);
 
-    WinningNumbers save(WinningNumbers winningNumbers);
-
 }

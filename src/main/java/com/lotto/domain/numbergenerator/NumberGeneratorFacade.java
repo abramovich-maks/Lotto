@@ -21,13 +21,14 @@ public class NumberGeneratorFacade {
         SixRandomNumbersDto dto = randomGenerable.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand(), properties.count());
         Set<Integer> winningNumbers = dto.numbers();
         winningNumberValidator.validate(winningNumbers);
-        winningNumbersRepository.save(WinningNumbers.builder()
+        WinningNumbers winningNumbersDocument = WinningNumbers.builder()
                 .winningNumbers(winningNumbers)
                 .date(nextDrawDate)
-                .build());
+                .build();
+        WinningNumbers save = winningNumbersRepository.save(winningNumbersDocument);
         return WinningNumbersDto.builder()
-                .winningNumbers(winningNumbers)
-                .date(nextDrawDate)
+                .winningNumbers(save.winningNumbers())
+                .date(save.date())
                 .build();
     }
 
