@@ -22,11 +22,11 @@ class InMemoryWinningNumbersRepositoryTestImpl implements WinningNumbersReposito
         return Optional.ofNullable(inMemoryDatabase.get(date));
     }
 
-    @Override
-    public WinningNumbers save(final WinningNumbers winningNumbers) {
-        inMemoryDatabase.put(winningNumbers.date(), winningNumbers);
-        return winningNumbers;
-    }
+//    @Override
+//    public WinningNumbers save(final WinningNumbers winningNumbers) {
+//        inMemoryDatabase.put(winningNumbers.date(), winningNumbers);
+//        return winningNumbers;
+//    }
 
     @Override
     public <S extends WinningNumbers> S insert(final S entity) {
@@ -71,6 +71,12 @@ class InMemoryWinningNumbersRepositoryTestImpl implements WinningNumbersReposito
     @Override
     public <S extends WinningNumbers, R> R findBy(final Example<S> example, final Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         return null;
+    }
+
+    @Override
+    public <S extends WinningNumbers> S save(final S entity) {
+        inMemoryDatabase.put(entity.date(), entity);
+        return entity;
     }
 
     @Override
