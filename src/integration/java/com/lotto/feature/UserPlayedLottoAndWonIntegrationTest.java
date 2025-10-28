@@ -17,9 +17,6 @@ import static org.awaitility.Awaitility.await;
 class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    RandomNumberGenerable randomNumberGenerable;
-
-    @Autowired
     NumberGeneratorFacade numberGeneratorFacade;
 
     @Test
@@ -43,13 +40,12 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .pollInterval(Duration.ofSeconds(1))
                 .until(() -> {
                             try {
-                                return numberGeneratorFacade.retrieveWinningNumberByDate(drawDate).winningNumbers().isEmpty();
+                                return !numberGeneratorFacade.retrieveWinningNumberByDate(drawDate).winningNumbers().isEmpty();
                             } catch (WinningNumbersNotFoundException e) {
                                 return false;
                             }
                         }
                 );
-        // then
 
 
         // step 3: user made POST /inputNumbers with 6 numbers (1, 2, 3, 4, 5, 6) at 16-11-2022 10:00 and system returned OK(200) with message: “success” and Ticket (DrawDate:19.11.2022 12:00 (Saturday), TicketId: sampleTicketId)
