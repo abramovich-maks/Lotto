@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ class InputNumbersRestController {
     private final NumberReceiverFacade numberReceiverFacade;
 
     @PostMapping("/inputNumbers")
-    public ResponseEntity<InputNumberResultDto> inputNumbers(@RequestBody InputNumbersRequestDto dto) {
+    public ResponseEntity<InputNumberResultDto> inputNumbers(@RequestBody @Valid InputNumbersRequestDto dto) {
         Set<Integer> collect = new HashSet<>(dto.inputNumbers());
         InputNumberResultDto inputNumberResultDto = numberReceiverFacade.inputNumbers(collect);
         return ResponseEntity.ok(inputNumberResultDto);
