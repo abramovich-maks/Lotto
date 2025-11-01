@@ -16,7 +16,7 @@ public class ResultCheckerFacade {
 
     private final NumberReceiverFacade numberReceiver;
     private final NumberGeneratorFacade numberGenerator;
-    private final TicketRepository ticketRepository;
+    private final TicketResultRepository ticketRepository;
     private final WinnersRetriever winnersRetriever;
 
     public List<TicketResult> createResultList() {
