@@ -77,7 +77,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 () -> assertThat(numberReceiverResponseDto.message()).isEqualTo("success")
         );
 
-        //step 4: user made GET /results/notExistingId and system returned 404(NOT_FOUND) and body with (message: Not found for id: notExistingId and status NOT_FOUND)
+        //step 4: user made GET /results/notExistingId and system returned 404(NOT_FOUND) and body with (message: Ticket with id: notExistingId not found and status NOT_FOUND)
         // given
         // when
         ResultActions performGetResultWithNotExistingId = mockMvc.perform(get("/result/" + "notExistingId"));
@@ -86,7 +86,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                 .andExpect(content().json(
                         """
                                 {
-                                "message" : "Not found for id: notExistingId" ,
+                                "message" : "Ticket with id: notExistingId not found" ,
                                  "status": "NOT_FOUND"
                                  }
                                 """.trim()
