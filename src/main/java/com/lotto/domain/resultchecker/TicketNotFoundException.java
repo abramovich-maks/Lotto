@@ -1,7 +1,7 @@
 package com.lotto.domain.resultchecker;
 
-class TicketNotFoundException extends RuntimeException {
-    TicketNotFoundException(final String message) {
+public class TicketNotFoundException extends RuntimeException {
+    public TicketNotFoundException(final String message) {
         super(message);
     }
 }

@@ -25,7 +25,7 @@ class ResultCheckerFacadeTest {
     ResultCheckerFacade resultCheckerFacade = ResultCheckerConfiguration.resultCheckerFacade(
             numberReceiverFacade,
             numberGeneratorFacade,
-            new InMemoryTicketRepositoryTestIml()
+            new InMemoryTicketResultRepositoryTestIml()
     );
 
     @Test

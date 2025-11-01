@@ -18,7 +18,9 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
@@ -68,15 +70,33 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
         MvcResult mvcResult = perform.andExpect(status().isOk()).andReturn();
         String json = mvcResult.getResponse().getContentAsString();
         InputNumberResultDto numberReceiverResponseDto = objectMapper.readValue(json, InputNumberResultDto.class);
+        String hash = numberReceiverResponseDto.ticketDto().hash();
         assertAll(
                 () -> assertThat(numberReceiverResponseDto.ticketDto().drawDate()).isEqualTo(drawDate),
-                () -> assertThat(numberReceiverResponseDto.ticketDto().hash()).isNotNull(),
+                () -> assertThat(hash).isNotNull(),
                 () -> assertThat(numberReceiverResponseDto.message()).isEqualTo("success")
         );
-        // step 4: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
+
+        //step 4: user made GET /results/notExistingId and system returned 404(NOT_FOUND) and body with (message: Ticket with id: notExistingId not found and status NOT_FOUND)
+        // given
+        // when
+        ResultActions performGetResultWithNotExistingId = mockMvc.perform(get("/result/" + "notExistingId"));
+        // then
+        performGetResultWithNotExistingId.andExpect(status().isNotFound())
+                .andExpect(content().json(
+                        """
+                                {
+                                "message" : "Ticket with id: notExistingId not found" ,
+                                 "status": "NOT_FOUND"
+                                 }
+                                """.trim()
+
+                ));
+
+        // step 5: 3 days and 1 minute passed, and it is 1 minute after the draw date (19.11.2022 12:01)
         clock.plusDaysAndMinutes(3, 5);
-        // step 5: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
-        // step 6: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
-        // step 7: user made GET /results/sampleTicketId and system returned 200 (OK)
+        // step 6: system generated result for TicketId: sampleTicketId with draw date 19.11.2022 12:00, and saved it with 6 hits
+        // step 7: 3 hours passed, and it is 1 minute after announcement time (19.11.2022 15:01)
+        // step 8: user made GET /results/sampleTicketId and system returned 200 (OK)
     }
 }
