@@ -22,3 +22,5 @@ lotto:
           port: 9090
           connectionTimeout: 5000
           readTimeout: 5000
+  tickets-results:
+    occurrence: "00 55 11 * * 6"
