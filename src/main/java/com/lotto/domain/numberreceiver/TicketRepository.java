@@ -9,7 +9,5 @@ import java.util.List;
 @Repository
 interface TicketRepository extends MongoRepository<Ticket, String> {
 
-    Ticket save(Ticket ticket);
-
     List<Ticket> findAllTicketsByDrawDate(LocalDateTime date);
 }

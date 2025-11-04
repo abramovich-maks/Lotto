@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.lotto.domain.resultchecker.ResulCheckerMapper.mapFromTicketResultToTicketResultDto;
+
 @AllArgsConstructor
 public class ResultCheckerFacade {
 
@@ -19,7 +21,7 @@ public class ResultCheckerFacade {
     private final TicketResultRepository ticketRepository;
     private final WinnersRetriever winnersRetriever;
 
-    public List<TicketResult> createResultList() {
+    public List<TicketResultDto> createResultList() {
         WinningNumbersDto winningNumbersDto = numberGenerator.generateWinningNumbers();
         Set<Integer> winningNumbers = winningNumbersDto.winningNumbers();
         if (winningNumbers == null || winningNumbers.isEmpty()) {
@@ -30,7 +32,7 @@ public class ResultCheckerFacade {
 
         List<TicketResult> results = winnersRetriever.retrieveWinners(tickets, winningNumbers);
         List<TicketResult> saved = ticketRepository.saveAll(results);
-        return saved;
+        return mapFromTicketResultToTicketResultDto(saved);
     }
 
     public TicketResultDto findByTicketId(String ticketId) {

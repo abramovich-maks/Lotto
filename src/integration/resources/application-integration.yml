@@ -1,3 +1,5 @@
 lotto:
   number-generator:
     lotteryRunOccurrence: "*/5 * * * * *"
+  tickets-results:
+    occurrence: "*/7 * * * * *"

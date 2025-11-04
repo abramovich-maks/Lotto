@@ -2,6 +2,7 @@ package com.lotto.domain.numbergenerator;
 
 import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numbergenerator.dto.WinningNumbersDto;
+import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -16,11 +17,13 @@ class NumberGeneratorFacadeTest {
 
     private final WinningNumbersRepository winningNumbersRepository = new InMemoryWinningNumbersRepositoryTestImpl();
     DrawDateFacade drawDateFacade = mock(DrawDateFacade.class);
+    NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
     NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
             new NumberGeneratorTestImp(),
             drawDateFacade,
-            winningNumbersRepository
+            winningNumbersRepository,
+            numberReceiverFacade
     );
 
 
@@ -45,7 +48,8 @@ class NumberGeneratorFacadeTest {
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 new NumberGeneratorTestImp(),
                 drawDateFacade,
-                winningNumbersRepository
+                winningNumbersRepository,
+                numberReceiverFacade
         );
         WinningNumbersDto generatedNumbers = numberGeneratorFacade.generateWinningNumbers();
         // then
@@ -64,7 +68,8 @@ class NumberGeneratorFacadeTest {
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 generator,
                 drawDateFacade,
-                repositoryTest
+                repositoryTest,
+                numberReceiverFacade
         );
         assertThrows(IllegalStateException.class, numberGeneratorFacade::generateWinningNumbers, "Number out of range!");
     }
@@ -93,7 +98,8 @@ class NumberGeneratorFacadeTest {
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 generator,
                 drawDateFacade,
-                repo
+                repo,
+                numberReceiverFacade
         );
         // when
         WinningNumbersDto dto = numberGeneratorFacade.retrieveWinningNumberByDate(dateTime);
@@ -114,7 +120,8 @@ class NumberGeneratorFacadeTest {
         NumberGeneratorFacade numberGeneratorFacade = new NumberGeneratorConfiguration().numberGeneratorFacadeForTest(
                 generator,
                 drawDateFacade,
-                repo
+                repo,
+                numberReceiverFacade
         );
         assertThrows(WinningNumbersNotFoundException.class, () -> numberGeneratorFacade.retrieveWinningNumberByDate(dateTime));
     }

@@ -16,6 +16,7 @@ record ResultResponse(
         Set<Integer> userNumbers,
         Set<Integer> winningNumbers,
         int matches,
-        String resultCategory
+        String resultCategory,
+        LocalDateTime createdDate
 ) {
 }

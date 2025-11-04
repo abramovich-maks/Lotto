@@ -6,6 +6,7 @@ import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.dto.TicketResultDto;
 import org.junit.jupiter.api.Test;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -19,7 +20,8 @@ class ResultAnnouncerFacadeTest {
 
     ResultAnnouncerFacade resultAnnouncerFacade = ResultAnnouncerConfiguration.resultAnnouncerFacade(
             resultCheckerFacade,
-            new InMemoryResultAnnouncerTestImpl()
+            new InMemoryResultAnnouncerTestImpl(),
+            Clock.systemUTC()
     );
 
     @Test
@@ -68,10 +70,10 @@ class ResultAnnouncerFacadeTest {
 
         when(resultCheckerFacade.findByTicketId(hash)).thenReturn(resultDto);
         //when
-        ResultAnnouncerResponseDto resultAnnouncerResponseDto = resultAnnouncerFacade.checkResult(hash);
+       resultAnnouncerFacade.checkResult(hash);
         ResultAnnouncerResponseDto resultAnnouncerResponseDto2 = resultAnnouncerFacade.checkResult(hash);
         //then
-        ResultAnnouncerResponseDto result = new ResultAnnouncerResponseDto(responseDto, "OK (from cache)");
+        ResultAnnouncerResponseDto result = new ResultAnnouncerResponseDto(responseDto, "Result retrieved from cache");
         assertThat(resultAnnouncerResponseDto2).isEqualTo(result);
     }
 
