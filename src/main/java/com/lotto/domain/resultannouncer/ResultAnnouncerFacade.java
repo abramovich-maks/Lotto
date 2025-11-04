@@ -6,9 +6,10 @@ import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.dto.TicketResultDto;
 import lombok.AllArgsConstructor;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static com.lotto.domain.resultannouncer.ResultMapper.mapFromTicketResultDtoToResultResponse;
 import static com.lotto.domain.resultannouncer.ResultMapper.mapFromResultResponseToResponseDto;
 
 @AllArgsConstructor
@@ -16,6 +17,7 @@ public class ResultAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;
     private final AnnouncerRepository announcerRepository;
+    private final Clock clock;
 
     public ResultAnnouncerResponseDto checkResult(String hash) {
         if (hash == null || hash.isBlank()) {
@@ -25,14 +27,9 @@ public class ResultAnnouncerFacade {
                     .build();
         }
         if (announcerRepository.existsById(hash)) {
-            Optional<ResultResponse> resultFromCashed = announcerRepository.findById(hash);
-            if (resultFromCashed.isPresent()) {
-                ResultResponse cached = resultFromCashed.get();
-                ResponseDto responseDto = mapFromResultResponseToResponseDto(cached);
-                return ResultAnnouncerResponseDto.builder()
-                        .responseDto(responseDto)
-                        .message("OK (from cache)")
-                        .build();
+            Optional<ResultResponse> resultResponseCached = announcerRepository.findById(hash);
+            if (resultResponseCached.isPresent()) {
+                return new ResultAnnouncerResponseDto(mapFromResultResponseToResponseDto(resultResponseCached.get()), "Result retrieved from cache");
             }
         }
         TicketResultDto byTicketId = resultCheckerFacade.findByTicketId(hash);
@@ -42,12 +39,42 @@ public class ResultAnnouncerFacade {
                     .message("Hash does not exist")
                     .build();
         }
-        ResultResponse responseToSave = mapFromTicketResultDtoToResultResponse(byTicketId);
-        announcerRepository.save(responseToSave);
-        ResponseDto responseDto = mapFromResultResponseToResponseDto(responseToSave);
+        ResponseDto responseDto = buildResponseDto(byTicketId);
+        announcerRepository.save(buildResponse(responseDto, LocalDateTime.now(clock)));
+        if (announcerRepository.existsById(hash) && !isAfterResultAnnouncementTime(byTicketId)) {
+            return new ResultAnnouncerResponseDto(responseDto, "Result not announced yet");
+        }
         return ResultAnnouncerResponseDto.builder()
                 .responseDto(responseDto)
-                .message("OK")
+                .message("Result available")
                 .build();
+    }
+
+    private static ResultResponse buildResponse(ResponseDto responseDto, LocalDateTime now) {
+        return ResultResponse.builder()
+                .hash(responseDto.hash())
+                .drawDate(responseDto.drawDate())
+                .userNumbers(responseDto.userNumbers())
+                .winningNumbers(responseDto.winningNumbers())
+                .matches(responseDto.matches())
+                .resultCategory(responseDto.resultCategory())
+                .createdDate(now)
+                .build();
+    }
+
+    private static ResponseDto buildResponseDto(TicketResultDto resultDto) {
+        return ResponseDto.builder()
+                .hash(resultDto.hash())
+                .drawDate(resultDto.drawDate())
+                .userNumbers(resultDto.userNumbers())
+                .winningNumbers(resultDto.winningNumbers())
+                .matches(resultDto.matches())
+                .resultCategory(resultDto.resultCategory())
+                .build();
+    }
+
+    private boolean isAfterResultAnnouncementTime(TicketResultDto resultDto) {
+        LocalDateTime announcementDateTime = resultDto.drawDate();
+        return LocalDateTime.now(clock).isAfter(announcementDateTime);
     }
 }

@@ -34,7 +34,7 @@ class ResultCheckerFacadeTest {
         LocalDateTime drawDate = LocalDateTime.of(2025, 10, 25, 12, 0);
         when(numberGeneratorFacade.generateWinningNumbers()).thenReturn(new WinningNumbersDto(Set.of(), drawDate));
         // when
-        List<TicketResult> resultList = resultCheckerFacade.createResultList();
+        List<TicketResultDto> resultList = resultCheckerFacade.createResultList();
         // then
         assertThat(resultList).isEmpty();
     }
@@ -47,7 +47,7 @@ class ResultCheckerFacadeTest {
 
         WinnersRetriever winnersRetriever = new WinnersRetriever();
         // when
-        List<TicketResult> resultList = resultCheckerFacade.createResultList();
+        List<TicketResultDto> resultList = resultCheckerFacade.createResultList();
         winnersRetriever.retrieveWinners(null, Set.of(1, 2, 3, 4, 5, 6));
         // then
         assertThat(resultList.size()).isEqualTo(0);
@@ -64,7 +64,7 @@ class ResultCheckerFacadeTest {
         TicketDto t2 = new TicketDto("ticket-2", Set.of(10, 20, 30, 40, 50, 60), drawDate);
         when(numberReceiverFacade.retrieveAllTicketsByDrawDate(drawDate)).thenReturn(List.of(t1, t2));
         // when
-        List<TicketResult> saved = resultCheckerFacade.createResultList();
+        List<TicketResultDto> saved = resultCheckerFacade.createResultList();
         // then
         assertThat(saved).hasSize(2);
         assertThat(saved.stream().filter(result -> result.hash().equals("ticket-1")).findFirst().get().matches()).isEqualTo(3);
@@ -85,7 +85,7 @@ class ResultCheckerFacadeTest {
         TicketDto t6 = new TicketDto("ticket-6", Set.of(1, 2, 3, 4, 5, 6), drawDate);
         when(numberReceiverFacade.retrieveAllTicketsByDrawDate(drawDate)).thenReturn(List.of(t0, t1, t2, t3, t4, t5, t6));
         // when
-        List<TicketResult> saved = resultCheckerFacade.createResultList();
+        List<TicketResultDto> saved = resultCheckerFacade.createResultList();
         // then
         assertThat(saved).hasSize(7);
         assertThat(saved.stream().filter(result -> result.hash().equals("ticket-0")).findFirst().get().resultCategory()).isEqualTo("NO_MATCH");
@@ -107,7 +107,7 @@ class ResultCheckerFacadeTest {
         TicketDto t1 = new TicketDto("ticket-1", Set.of(6, 7, 8, 9, 10, 11), drawDate);
         when(numberReceiverFacade.retrieveAllTicketsByDrawDate(drawDate)).thenReturn(List.of(t0, t1));
         // when
-        List<TicketResult> resultList = resultCheckerFacade.createResultList();
+        List<TicketResultDto> resultList = resultCheckerFacade.createResultList();
         TicketResultDto byTicketId = resultCheckerFacade.findByTicketId("ticket-1");
         // then
         assertThat(resultList.size()).isEqualTo(2);

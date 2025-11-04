@@ -22,6 +22,11 @@ class InMemoryWinningNumbersRepositoryTestImpl implements WinningNumbersReposito
         return Optional.ofNullable(inMemoryDatabase.get(date));
     }
 
+    @Override
+    public boolean existsByDate(final LocalDateTime nextDrawDate) {
+        return false;
+    }
+
 //    @Override
 //    public WinningNumbers save(final WinningNumbers winningNumbers) {
 //        inMemoryDatabase.put(winningNumbers.date(), winningNumbers);
