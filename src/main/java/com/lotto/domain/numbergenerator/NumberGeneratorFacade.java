@@ -20,7 +20,7 @@ public class NumberGeneratorFacade {
 
     public WinningNumbersDto generateWinningNumbers() {
         LocalDateTime nextDrawDate = drawDateFacade.getNextDrawDate();
-        SixRandomNumbersDto dto = randomGenerable.generateSixRandomNumbers(properties.lowerBand(), properties.upperBand(), properties.count());
+        SixRandomNumbersDto dto = randomGenerable.generateSixRandomNumbers(properties.count(), properties.lowerBand(), properties.upperBand() );
         Set<Integer> winningNumbers = dto.numbers();
         winningNumberValidator.validate(winningNumbers);
         WinningNumbers winningNumbersDocument = WinningNumbers.builder()

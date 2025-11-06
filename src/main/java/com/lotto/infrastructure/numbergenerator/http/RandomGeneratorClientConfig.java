@@ -1,6 +1,7 @@
 package com.lotto.infrastructure.numbergenerator.http;
 
 import com.lotto.domain.numbergenerator.RandomNumberGenerable;
+import lombok.AllArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,14 +11,10 @@ import java.time.Duration;
 
 
 @Configuration
+@AllArgsConstructor
 public class RandomGeneratorClientConfig {
 
-
-    private final RundomNumberGeneratorRestTemplateConfigurationsProperties properties;
-
-    public RandomGeneratorClientConfig(final RundomNumberGeneratorRestTemplateConfigurationsProperties properties) {
-        this.properties = properties;
-    }
+    private final RandomNumberGeneratorRestTemplateConfigurationProperties properties;
 
     @Bean
     public RestTemplateResponseErrorHandler restTemplateResponseErrorHandler() {
