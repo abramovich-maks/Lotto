@@ -24,3 +24,9 @@ lotto:
           readTimeout: 5000
   tickets-results:
     occurrence: "00 55 11 * * 6"
+
+auth:
+  jwt:
+    expirationDays: 30
+    secret: ${JWT_SECRET}
+    issuer: lotto-backend
