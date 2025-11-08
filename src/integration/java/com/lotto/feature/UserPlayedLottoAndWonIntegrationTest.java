@@ -2,6 +2,7 @@ package com.lotto.feature;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.lotto.BaseIntegrationTest;
+import com.lotto.IntegrationTestData;
 import com.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import com.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
@@ -24,9 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
+class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implements IntegrationTestData {
 
     @Autowired
     NumberGeneratorFacade numberGeneratorFacade;
@@ -46,6 +48,15 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest {
                                 [1, 2, 3, 4, 5, 6, 82, 82, 83, 83, 86, 57, 10, 81, 53, 93, 50, 54, 31, 88, 15, 43, 79, 32, 43]
                                 """.trim()
                         )));
+
+
+        //         step 1_1: użytkownik próbuje uzyskać token JWT, wysyłając POST /token z mail=maksim@mail.com i password=12345 and system returned UNAUTHORIZED(401)
+        // given && when && then
+        mockMvc.perform(post("/token").content(requestBodyLogin())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.message").value("Bad credentials"))
+                .andExpect(jsonPath("$.status").value("UNAUTHORIZED"));
 
 
         // step 2: system fetched winning numbers for draw date: 01.11.2025 12:00
