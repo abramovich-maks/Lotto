@@ -3,3 +3,9 @@ lotto:
     lotteryRunOccurrence: "*/5 * * * * *"
   tickets-results:
     occurrence: "*/7 * * * * *"
+
+spring:
+  cache:
+    type: none
+    redis:
+      time-to-live: PT10S
