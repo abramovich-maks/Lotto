@@ -1,5 +1,12 @@
 spring:
+  cache:
+    type: redis
+    redis:
+      time-to-live: PT20M
   data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:63792}
     mongodb:
       uri: mongodb://admin:admin@localhost:27017/lotto-web
   main:
@@ -10,7 +17,8 @@ spring:
 
 lotto:
   number-generator:
-    lotteryRunOccurrence: "0 0 12 * * 6"
+    lotteryRunOccurrence: "3 * * * * *"
+#    lotteryRunOccurrence: "0 0 12 * * 6"
     facade:
       count: 25
       lowerBand: 1
@@ -23,7 +31,8 @@ lotto:
           connectionTimeout: 5000
           readTimeout: 5000
   tickets-results:
-    occurrence: "00 55 11 * * 6"
+    occurrence: "5 * * * * *"
+#    occurrence: "00 55 11 * * 6"
 
 auth:
   jwt:
