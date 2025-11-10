@@ -5,6 +5,7 @@ import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.dto.TicketResultDto;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class ResultAnnouncerFacade {
     private final AnnouncerRepository announcerRepository;
     private final Clock clock;
 
+    @Cacheable(value = "resultAnnounce")
     public ResultAnnouncerResponseDto checkResult(String hash) {
         if (hash == null || hash.isBlank()) {
             return ResultAnnouncerResponseDto.builder()
