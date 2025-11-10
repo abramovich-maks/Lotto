@@ -74,7 +74,7 @@ class RedisResultCacheIntegrationTest extends BaseIntegrationTest implements Int
         //given && when
         mockMvc.perform(get("/result/hash")
                 .header("Authorization", "Bearer " + jwtToken)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(status().isOk());
+                .contentType(MediaType.APPLICATION_JSON_VALUE)).andExpect(status().isNotFound());
         //then
         verify(resultAnnouncerFacade, times(1)).checkResult("hash");
         assertThat(cacheManager.getCacheNames().contains("resultAnnounce")).isTrue();
