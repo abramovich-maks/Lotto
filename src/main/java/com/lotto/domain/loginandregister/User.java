@@ -12,7 +12,7 @@ import java.util.List;
 
 @Builder
 @Document
-record User(
+public record User(
         @Id String userId,
         @Indexed(unique = true) String email,
         String password

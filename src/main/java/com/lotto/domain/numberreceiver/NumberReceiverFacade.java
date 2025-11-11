@@ -4,6 +4,7 @@ import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -27,7 +28,8 @@ public class NumberReceiverFacade {
         }
         String hashTicket = hashGenerator.getHash();
         LocalDateTime drawDate = drawDateFacade.getNextDrawDate();
-        Ticket savedTicket = repository.save(new Ticket(hashTicket, numbersFromUser, drawDate));
+        String userName = getCurrentUser();
+        Ticket savedTicket = repository.save(new Ticket(hashTicket, numbersFromUser, drawDate, userName));
         return InputNumberResultDto.builder()
                 .ticketDto(TicketMapper.mapFromTicket(savedTicket))
                 .message("success")
@@ -47,5 +49,11 @@ public class NumberReceiverFacade {
 
     public LocalDateTime retrieveNextDrawDate() {
         return drawDateFacade.getNextDrawDate();
+    }
+
+    private String getCurrentUser() {
+        return SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
     }
 }

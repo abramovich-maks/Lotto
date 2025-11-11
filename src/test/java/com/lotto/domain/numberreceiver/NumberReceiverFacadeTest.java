@@ -1,9 +1,15 @@
 package com.lotto.domain.numberreceiver;
 
 import com.lotto.domain.drowdate.DrawDateFacade;
+import com.lotto.domain.loginandregister.User;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,6 +33,7 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_success_when_user_gave_six_unique_numbers_in_range() {
         // given
+        initializeMockUser();
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
@@ -36,8 +43,10 @@ class NumberReceiverFacadeTest {
     }
 
     @Test
+    @WithMockUser()
     public void should_return_save_to_database_when_user_gave_six_unique_numbers_in_range() {
         // given
+        initializeMockUser();
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
@@ -87,6 +96,7 @@ class NumberReceiverFacadeTest {
     @Test
     void should_return_next_saturday_if_now_is_exactly_12() {
         // given
+        initializeMockUser();
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
@@ -98,6 +108,7 @@ class NumberReceiverFacadeTest {
     @Test
     void should_store_multiple_tickets_for_same_draw_date() {
         // given
+        initializeMockUser();
         Set<Integer> numbers1 = Set.of(1, 2, 3, 4, 5, 6);
         Set<Integer> numbers2 = Set.of(7, 8, 9, 10, 11, 12);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
@@ -123,5 +134,15 @@ class NumberReceiverFacadeTest {
         // then
         LocalDateTime expectedDrawDate = LocalDateTime.of(2025, 10, 25, 12, 0, 0);
         assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
+    }
+
+    private static void initializeMockUser() {
+        User mockUser = new User("test-user-id", "username", "password");
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(authentication.getPrincipal()).thenReturn(mockUser);
+        SecurityContextHolder.setContext(securityContext);
     }
 }

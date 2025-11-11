@@ -11,5 +11,6 @@ import java.util.Set;
 record Ticket(
         String hash,
         Set<Integer> numbers,
-        LocalDateTime drawDate) {
+        LocalDateTime drawDate,
+        String userName) {
 }
