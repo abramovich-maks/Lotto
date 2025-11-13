@@ -1,6 +1,5 @@
 package com.lotto.domain.numberreceiver;
 
-import com.lotto.domain.numberreceiver.dto.TicketDto;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,7 +31,7 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
     }
 
     @Override
-    public List<TicketDto> findAllTicketsByUserName(final String userName) {
+    public List<Ticket> findAllTicketsByUserName(final String userName) {
         return List.of();
     }
 

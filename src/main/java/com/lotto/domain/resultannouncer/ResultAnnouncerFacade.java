@@ -1,6 +1,7 @@
 package com.lotto.domain.resultannouncer;
 
 import com.lotto.domain.numberreceiver.NumberReceiverFacade;
+import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
@@ -10,7 +11,6 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,8 +57,12 @@ public class ResultAnnouncerFacade {
     }
 
     public List<TicketListByUser> createListAllTicketByUser() {
-numberReceiverFacade.retrieveAllTicketsByUsername();
-
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
+        return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
+                .hash(ticketDto.hash())
+                .numbers(ticketDto.numbers())
+                .drawDate(ticketDto.drawDate())
+                .build()).toList();
     }
 
     private static ResultResponse buildResponse(ResponseDto responseDto, LocalDateTime now) {
