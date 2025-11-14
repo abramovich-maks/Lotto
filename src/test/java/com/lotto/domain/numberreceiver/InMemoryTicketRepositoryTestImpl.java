@@ -32,7 +32,10 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
 
     @Override
     public List<Ticket> findAllTicketsByUserName(final String userName) {
-        return List.of();
+        return inMemoryDatabase.values()
+                .stream()
+                .filter(ticket -> ticket.userName().equals(userName))
+                .toList();
     }
 
     @Override
