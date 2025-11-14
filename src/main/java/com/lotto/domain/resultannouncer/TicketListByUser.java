@@ -2,6 +2,7 @@ package com.lotto.domain.resultannouncer;
 
 import lombok.Builder;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -10,5 +11,5 @@ public record TicketListByUser(
         String hash,
         Set<Integer> numbers,
         LocalDateTime drawDate
-) {
+) implements Serializable {
 }

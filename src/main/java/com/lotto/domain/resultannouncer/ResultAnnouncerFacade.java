@@ -56,6 +56,7 @@ public class ResultAnnouncerFacade {
                 .build();
     }
 
+    @Cacheable(value = "listTickets")
     public List<TicketListByUser> createListAllTicketByUser() {
         List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
         return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
