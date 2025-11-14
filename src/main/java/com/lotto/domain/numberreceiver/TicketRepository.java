@@ -10,4 +10,6 @@ import java.util.List;
 interface TicketRepository extends MongoRepository<Ticket, String> {
 
     List<Ticket> findAllTicketsByDrawDate(LocalDateTime date);
+
+    List<Ticket> findAllTicketsByUserName(String userName);
 }

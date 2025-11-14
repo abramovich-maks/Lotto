@@ -1,11 +1,13 @@
 package com.lotto.feature;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.lotto.BaseIntegrationTest;
 import com.lotto.IntegrationTestData;
 import com.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import com.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
+import com.lotto.domain.resultannouncer.TicketListByUser;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.TicketNotFoundException;
@@ -19,6 +21,8 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -185,6 +189,23 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
                 () -> assertThat(finalResult.message()).isEqualTo("Result available"),
                 () -> assertThat(finalResult.responseDto().hash()).isEqualTo(hash),
                 () -> assertThat(finalResult.responseDto().resultCategory()).isEqualTo("JACKPOT")
+        );
+
+        // step 13: user made GET /results and system returned 200 (OK)
+        // given && when
+        ResultActions performGetResults = mockMvc.perform(get("/result")
+                .header("Authorization", "Bearer " + token));
+        // then
+        MvcResult mvcResultGetAllTickets = performGetResults.andExpect(status().isOk()).andReturn();
+        String jsonGetAllTickets = mvcResultGetAllTickets.getResponse().getContentAsString();
+        List<TicketListByUser> userTickets = objectMapper.readValue(jsonGetAllTickets, new TypeReference<>() {
+        });
+        TicketListByUser ticket = userTickets.get(0);
+        assertAll(
+                () -> assertThat(userTickets).hasSize(1),
+                () -> assertThat(ticket.hash()).isNotNull(),
+                () -> assertThat(ticket.numbers()).isEqualTo(Set.of(1, 2, 3, 4, 5, 6)),
+                () -> assertThat(ticket.drawDate()).isEqualTo(drawDate)
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.lotto.domain.resultannouncer;
 
+import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
@@ -17,10 +18,12 @@ import static org.mockito.Mockito.when;
 class ResultAnnouncerFacadeTest {
 
     ResultCheckerFacade resultCheckerFacade = mock(ResultCheckerFacade.class);
+    NumberReceiverFacade numberReceiverFacade = mock(NumberReceiverFacade.class);
 
     ResultAnnouncerFacade resultAnnouncerFacade = ResultAnnouncerConfiguration.resultAnnouncerFacade(
             resultCheckerFacade,
             new InMemoryResultAnnouncerTestImpl(),
+            numberReceiverFacade,
             Clock.systemUTC()
     );
 
@@ -70,7 +73,7 @@ class ResultAnnouncerFacadeTest {
 
         when(resultCheckerFacade.findByTicketId(hash)).thenReturn(resultDto);
         //when
-       resultAnnouncerFacade.checkResult(hash);
+        resultAnnouncerFacade.checkResult(hash);
         ResultAnnouncerResponseDto resultAnnouncerResponseDto2 = resultAnnouncerFacade.checkResult(hash);
         //then
         ResultAnnouncerResponseDto result = new ResultAnnouncerResponseDto(responseDto, "Result retrieved from cache");

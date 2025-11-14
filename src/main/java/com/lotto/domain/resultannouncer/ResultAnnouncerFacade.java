@@ -1,5 +1,7 @@
 package com.lotto.domain.resultannouncer;
 
+import com.lotto.domain.numberreceiver.NumberReceiverFacade;
+import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
@@ -9,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static com.lotto.domain.resultannouncer.ResultMapper.mapFromResultResponseToResponseDto;
@@ -18,6 +21,7 @@ public class ResultAnnouncerFacade {
 
     private final ResultCheckerFacade resultCheckerFacade;
     private final AnnouncerRepository announcerRepository;
+    private final NumberReceiverFacade numberReceiverFacade;
     private final Clock clock;
 
     @Cacheable(value = "resultAnnounce")
@@ -50,6 +54,16 @@ public class ResultAnnouncerFacade {
                 .responseDto(responseDto)
                 .message("Result available")
                 .build();
+    }
+
+    @Cacheable(value = "listTickets")
+    public List<TicketListByUser> createListAllTicketByUser() {
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
+        return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
+                .hash(ticketDto.hash())
+                .numbers(ticketDto.numbers())
+                .drawDate(ticketDto.drawDate())
+                .build()).toList();
     }
 
     private static ResultResponse buildResponse(ResponseDto responseDto, LocalDateTime now) {

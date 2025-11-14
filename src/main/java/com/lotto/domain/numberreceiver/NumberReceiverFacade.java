@@ -47,6 +47,14 @@ public class NumberReceiverFacade {
                 .toList();
     }
 
+    public List<TicketDto> retrieveAllTicketsByUsername() {
+        String userName = getCurrentUser();
+        return repository.findAllTicketsByUserName(userName)
+                .stream()
+                .map(TicketMapper::mapFromTicket)
+                .toList();
+    }
+
     public LocalDateTime retrieveNextDrawDate() {
         return drawDateFacade.getNextDrawDate();
     }

@@ -7,7 +7,6 @@ import com.lotto.domain.numberreceiver.dto.TicketDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
-
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 
@@ -136,6 +135,30 @@ class NumberReceiverFacadeTest {
         assertThat(testedDrawDate).isEqualTo(expectedDrawDate);
     }
 
+    @Test
+    public void should_return_all_tickets_by_login_user() {
+        initializeMockUser();
+        Set<Integer> numbersForTicketOne = Set.of(1, 2, 3, 4, 5, 6);
+        Set<Integer> numbersForTicketTwo = Set.of(10, 20, 30, 40, 50, 60);
+        Set<Integer> numbersForTicketThree = Set.of(19, 29, 39, 49, 59, 69);
+        when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
+
+        InputNumberResultDto result1 = numberReceiverFacade.inputNumbers(numbersForTicketOne);
+        InputNumberResultDto result2 = numberReceiverFacade.inputNumbers(numbersForTicketTwo);
+        InputNumberResultDto result3 = numberReceiverFacade.inputNumbers(numbersForTicketThree);
+
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
+
+        assertThat(ticketDtos).hasSize(3);
+        assertThat(ticketDtos)
+                .extracting(TicketDto::hash)
+                .containsExactlyInAnyOrder(
+                        result1.ticketDto().hash(),
+                        result2.ticketDto().hash(),
+                        result3.ticketDto().hash()
+                );
+    }
+
     private static void initializeMockUser() {
         User mockUser = new User("test-user-id", "username", "password");
         Authentication authentication = mock(Authentication.class);
@@ -143,6 +166,7 @@ class NumberReceiverFacadeTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(mockUser);
+        when(authentication.getName()).thenReturn("username");
         SecurityContextHolder.setContext(securityContext);
     }
 }
