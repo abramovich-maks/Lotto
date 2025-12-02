@@ -12,6 +12,7 @@ class ResultMapper {
                 .userNumbers(response.userNumbers())
                 .winningNumbers(response.winningNumbers())
                 .matches(response.matches())
+                .matchedNumbers(response.matchedNumbers())
                 .resultCategory(response.resultCategory())
                 .build();
     }

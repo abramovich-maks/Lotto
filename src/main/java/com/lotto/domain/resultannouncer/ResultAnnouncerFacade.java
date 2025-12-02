@@ -85,6 +85,7 @@ public class ResultAnnouncerFacade {
                 .userNumbers(resultDto.userNumbers())
                 .winningNumbers(resultDto.winningNumbers())
                 .matches(resultDto.matches())
+                .matchedNumbers(resultDto.matchedNumbers())
                 .resultCategory(resultDto.resultCategory())
                 .build();
     }

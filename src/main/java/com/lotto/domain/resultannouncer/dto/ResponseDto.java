@@ -12,6 +12,7 @@ public record ResponseDto(
         LocalDateTime drawDate,
         Set<Integer> userNumbers,
         Set<Integer> winningNumbers,
+        Set<Integer> matchedNumbers,
         int matches,
         String resultCategory
 ) implements Serializable {

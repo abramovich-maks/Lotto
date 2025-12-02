@@ -15,6 +15,7 @@ record ResultResponse(
         LocalDateTime drawDate,
         Set<Integer> userNumbers,
         Set<Integer> winningNumbers,
+        Set<Integer> matchedNumbers,
         int matches,
         String resultCategory,
         LocalDateTime createdDate
