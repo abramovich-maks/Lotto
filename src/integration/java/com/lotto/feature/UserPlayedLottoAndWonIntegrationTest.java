@@ -11,7 +11,7 @@ import com.lotto.domain.resultannouncer.TicketListByUser;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.TicketNotFoundException;
-import com.lotto.infrastructure.loginandregister.controller.dto.JwtResponseDto;
+import com.lotto.infrastructure.security.jwt.lotto.JwtResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -83,12 +83,8 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
         JwtResponseDto jwtResponseDto = objectMapper.readValue(jsonWithToken, JwtResponseDto.class);
         String token = jwtResponseDto.token();
         assertAll(
-                () -> assertThat(jwtResponseDto.login()).isEqualTo("maksim@mail.com"),
-                () -> {
-                    assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$"));
-                }
-        );
-
+                () ->
+                        assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$")));
 
         // step 5: system fetched winning numbers for draw date: 01.11.2025 12:00
         // given

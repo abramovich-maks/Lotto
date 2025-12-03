@@ -1,4 +1,4 @@
-package com.lotto.infrastructure.loginandregister.controller.error;
+package com.lotto.infrastructure.security.jwt.lotto.error;
 
 import org.springframework.http.HttpStatus;
 

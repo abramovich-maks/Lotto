@@ -21,7 +21,7 @@ class InMemoryLoginAndRegisterFacadeTestImpl implements UserRepository {
     @Override
     public Optional<User> findFirstByEmail(final String email) {
         return inMemoryDatabase.values().stream()
-                .filter(user -> user.email().equals(email)).findFirst();
+                .filter(user -> user.getEmail().equals(email)).findFirst();
     }
 
     @Override
@@ -29,24 +29,30 @@ class InMemoryLoginAndRegisterFacadeTestImpl implements UserRepository {
         UUID id = UUID.randomUUID();
         User user = new User(
                 id.toString(),
-                entity.email(),
-                entity.password()
+                entity.getEmail(),
+                entity.getPassword(),
+                entity.getAuthorities()
         );
-        inMemoryDatabase.put(user.email(), user);
+        inMemoryDatabase.put(user.getEmail(), user);
         return (S) user;
     }
 
     @Override
     public boolean existsByEmail(final String email) {
         long count = inMemoryDatabase.values().stream()
-                .filter(user -> user.email().equals(email))
+                .filter(user -> user.getEmail().equals(email))
                 .count();
         return count == 1;
     }
 
     @Override
-    public List<User> findAllByUsername() {
+    public List<User> findAll() {
         return new ArrayList<>(inMemoryDatabase.values());
+    }
+
+    @Override
+    public Optional<User> findByConfirmationToken(final String confirmationToken) {
+        return Optional.empty();
     }
 
 
@@ -63,11 +69,6 @@ class InMemoryLoginAndRegisterFacadeTestImpl implements UserRepository {
     @Override
     public boolean existsById(final String s) {
         return false;
-    }
-
-    @Override
-    public List<User> findAll() {
-        return List.of();
     }
 
     @Override

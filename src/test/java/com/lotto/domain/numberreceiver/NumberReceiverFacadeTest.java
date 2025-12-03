@@ -160,7 +160,7 @@ class NumberReceiverFacadeTest {
     }
 
     private static void initializeMockUser() {
-        User mockUser = new User("test-user-id", "username", "password");
+        User mockUser = new User("test-user-id", "username", "password",Set.of("role"));
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 

@@ -1,6 +1,9 @@
 package com.lotto.infrastructure.security.jwt;
 
-import com.lotto.domain.loginandregister.LoginAndRegisterFacade;
+import com.lotto.domain.loginandregister.UserConformer;
+import com.lotto.domain.loginandregister.UserDetailsService;
+import com.lotto.domain.loginandregister.UserRepository;
+import com.lotto.infrastructure.security.jwt.lotto.JwtAuthTokenFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,26 +21,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 class SecurityConfig {
 
-    JwtAuthTokenFilter jwtAuthTokenFilter;
-
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public UserDetailsManager userDetailsService(LoginAndRegisterFacade loginAndRegister) {
-        return new UserDetailsService(loginAndRegister);
+    public UserDetailsManager userDetailsService(UserRepository userRepository, UserConformer userConformer) {
+        return new UserDetailsService(userRepository, passwordEncoder(), userConformer);
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable();
-        httpSecurity.authorizeRequests()
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity, JwtAuthTokenFilter jwtAuthTokenFilter) throws Exception {
+        httpSecurity.csrf().disable()
+                .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .authorizeRequests()
                 .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/v3/api-docs").permitAll()
                 .antMatchers("/webjars/**").permitAll()
                 .antMatchers("/token/**").permitAll()
+                .antMatchers("/confirm/**").permitAll()
                 .antMatchers("/register/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll()
                 .anyRequest().authenticated()
@@ -46,9 +49,7 @@ class SecurityConfig {
                 .and().httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .exceptionHandling()
-                .and()
-                .addFilterBefore(jwtAuthTokenFilter, UsernamePasswordAuthenticationFilter.class);
+                .exceptionHandling();
         return httpSecurity.build();
     }
 
