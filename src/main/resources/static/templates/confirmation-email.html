@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Confirm your Lotto account</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f4f6f8; margin:0; padding:0; }
+        .container { max-width: 600px; margin: 24px auto; background: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(15,23,42,0.08); }
+        .header { background: linear-gradient(90deg,#4f46e5,#06b6d4); padding: 20px; color: white; text-align: left; }
+        .logo { height: 36px; vertical-align: middle; }
+        .title { font-size: 20px; margin: 8px 0 0 0; }
+        .content { padding: 24px; color: #0f172a; line-height:1.5; }
+        .greeting { font-weight: 600; margin-bottom: 8px; }
+        .btn { display:inline-block; background: #06b6d4; color: #fff; padding: 12px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; box-shadow: 0 2px 6px rgba(6,182,212,0.25); }
+        .secondary { color: #475569; font-size: 13px; margin-top: 18px; }
+        .footer { background:#f8fafc; color:#94a3b8; font-size:13px; padding:14px 24px; text-align:center; }
+        .small { font-size:12px; color:#64748b; }
+        .link { color: #0ea5a4; word-break: break-all; }
+        @media (max-width:420px) {
+            .container { margin: 12px; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" th:remove="tag">
+    <div class="header">
+        <img th:if="${logoCid}" th:src="@{cid:${logoCid}}" alt="Lotto" class="logo" />
+        <div class="title">Lotto — Account Confirmation</div>
+    </div>
+
+    <div class="content">
+        <div class="greeting">Hello, <span th:text="${name}">User</span> 👋</div>
+
+        <p>Thank you for registering with Lotto. To complete your registration and activate your account, please click the button below:</p>
+
+        <p style="text-align:center; margin:20px 0;">
+            <a th:href="${confirmUrl}" class="btn" target="_blank" rel="noopener">Confirm Account</a>
+        </p>
+
+        <p class="secondary">If the button doesn't work, you can open this link in your browser:</p>
+        <p class="small link"><a th:href="${confirmUrl}" th:text="${confirmUrl}" target="_blank" rel="noopener"></a></p>
+
+        <p class="secondary">If you did not create an account with Lotto, simply ignore this email — the link will expire automatically.</p>
+
+        <p class="secondary">Best regards,<br/>The Lotto Team</p>
+    </div>
+
+    <div class="footer">
+        <div>Lottery. Take part and do something good.</div>
+        <div class="small">Need help? Contact us at: <a href="mailto:support@lotto.example">support@lotto.example</a></div>
+    </div>
+</div>
+</body>
+</html>
