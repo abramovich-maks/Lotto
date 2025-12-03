@@ -1,4 +1,15 @@
 spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_SENDER}
+    password: ${MAIL_SENDER_PWD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
   cache:
     type: redis
     redis:
@@ -34,6 +45,14 @@ lotto:
 
 auth:
   jwt:
-    expirationDays: 30
+    expirationMinutes: 10
     secret: ${JWT_SECRET}
     issuer: lotto-backend
+
+server:
+  ssl:
+    key-store-type: PKCS12
+    key-store: classpath:certificate.p12
+    key-store-password: ${KEY_STORE_PASSWORD}
+
+
