@@ -1,54 +1,42 @@
 package com.lotto.domain.loginandregister;
 
-import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
-@Builder
+@Getter
+@Setter
 @Document
-public record User(
-        @Id String userId,
-        @Indexed(unique = true) String email,
-        String password
-) implements UserDetails {
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
-    }
+public class User {
 
-    @Override
-    public String getPassword() {
-        return password;
-    }
+    @Id
+    private String userId;
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
+    @Indexed(unique = true)
+    private String email;
 
-    @Override
-    public boolean isAccountNonExpired() {
+    private String password;
+
+    private Collection<String> authorities;
+
+    private String confirmationToken;
+
+    private boolean enabled = false;
+
+    public boolean confirm() {
+        this.setEnabled(true);
+        this.setConfirmationToken(null);
         return true;
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    public User(final String email, final String password, String confirmationToken, final Collection<String> authorities) {
+        this.email = email;
+        this.password = password;
+        this.confirmationToken = confirmationToken;
+        this.authorities = authorities;
     }
 }

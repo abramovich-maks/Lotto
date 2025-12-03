@@ -20,19 +20,19 @@ class UserRetriever {
                     return new BadCredentialsException(email);
                 });
         return UserDto.builder()
-                .userId(userByEmail.userId())
-                .mail(userByEmail.email())
-                .password(userByEmail.password())
+                .userId(userByEmail.getUserId())
+                .mail(userByEmail.getEmail())
+                .password(userByEmail.getPassword())
                 .build();
     }
 
     List<UserDto> findAllUsers() {
-        List<User> allUsers = userRepository.findAllByUsername();
+        List<User> allUsers = userRepository.findAll();
         return allUsers.stream()
                 .map(user -> UserDto.builder()
-                        .userId(user.userId())
-                        .mail(user.email())
-                        .password(user.password())
+                        .userId(user.getUserId())
+                        .mail(user.getEmail())
+                        .password(user.getPassword())
                         .build())
                 .toList();
     }
