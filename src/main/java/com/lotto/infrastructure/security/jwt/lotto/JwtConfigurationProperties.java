@@ -1,4 +1,4 @@
-package com.lotto.infrastructure.security.jwt;
+package com.lotto.infrastructure.security.jwt.lotto;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(value = "auth.jwt")
 public record JwtConfigurationProperties(
         String secret,
-        long expirationDays,
+        long expirationMinutes,
         String issuer
 ) {
 }

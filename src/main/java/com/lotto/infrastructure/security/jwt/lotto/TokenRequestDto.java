@@ -1,4 +1,4 @@
-package com.lotto.infrastructure.loginandregister.controller.dto;
+package com.lotto.infrastructure.security.jwt.lotto;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
