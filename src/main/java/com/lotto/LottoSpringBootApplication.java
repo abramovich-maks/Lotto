@@ -2,7 +2,7 @@ package com.lotto;
 
 import com.lotto.domain.numbergenerator.WinningNumbersGeneratorFacadeConfigurationProperties;
 import com.lotto.infrastructure.numbergenerator.http.RandomNumberGeneratorRestTemplateConfigurationProperties;
-import com.lotto.infrastructure.security.jwt.JwtConfigurationProperties;
+import com.lotto.infrastructure.security.jwt.lotto.JwtConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

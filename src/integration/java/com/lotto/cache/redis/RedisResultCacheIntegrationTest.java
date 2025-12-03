@@ -3,7 +3,7 @@ package com.lotto.cache.redis;
 import com.lotto.BaseIntegrationTest;
 import com.lotto.IntegrationTestData;
 import com.lotto.domain.resultannouncer.ResultAnnouncerFacade;
-import com.lotto.infrastructure.loginandregister.controller.dto.JwtResponseDto;
+import com.lotto.infrastructure.security.jwt.lotto.JwtResponseDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
