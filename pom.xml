@@ -67,6 +67,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.awspring.cloud</groupId>
+            <artifactId>spring-cloud-starter-aws-secrets-manager-config</artifactId>
+            <version>2.4.4</version>
+        </dependency>
         <!--          TEST CONTAINERS -->
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -141,7 +146,7 @@
             <artifactId>jedis</artifactId>
             <version>${jedis.version}</version>
         </dependency>
-<!--        THYMELEAF-->
+        <!--        THYMELEAF-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -149,6 +154,7 @@
     </dependencies>
 
     <build>
+        <finalName>lotto</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
