@@ -2,6 +2,8 @@ package com.lotto.cache.redis;
 
 import com.lotto.BaseIntegrationTest;
 import com.lotto.IntegrationTestData;
+import com.lotto.domain.loginandregister.User;
+import com.lotto.domain.loginandregister.UserRepository;
 import com.lotto.domain.resultannouncer.ResultAnnouncerFacade;
 import com.lotto.infrastructure.security.jwt.lotto.JwtResponseDto;
 import org.junit.jupiter.api.Test;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
@@ -16,13 +19,18 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 
+import javax.mail.internet.MimeMessage;
 import java.time.Duration;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,14 +59,26 @@ class RedisResultCacheIntegrationTest extends BaseIntegrationTest implements Int
         registry.add("spring.cache.redis.time-to-live", () -> "PT1S");
     }
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
+
     @Test
     public void should_save_result_to_cache_and_then_invalidate_by_time_to_live() throws Exception {
         // step 1: someUser was registered with somePassword
         // given && when
+        MimeMessage mimeMessage = new MimeMessage((javax.mail.Session) null);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        doNothing().when(javaMailSender).send(any(org.springframework.mail.SimpleMailMessage.class));
+        doNothing().when(javaMailSender).send(any(org.springframework.mail.javamail.MimeMessagePreparator.class));
+
         mockMvc.perform(post("/register").content(requestBodyRegister())
-                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isCreated());
+                .contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 
-
+        resetDatabaseAndAddUserWithAcceptedConfirm();
         // step 2: login
         // given && when
         ResultActions successLoginRequest = mockMvc.perform(post("/token").content(requestBodyLogin())
@@ -91,5 +111,17 @@ class RedisResultCacheIntegrationTest extends BaseIntegrationTest implements Int
                             .contentType(MediaType.APPLICATION_JSON_VALUE));
                     verify(resultAnnouncerFacade, atLeast(2)).checkResult("hash");
                 });
+    }
+
+    private void resetDatabaseAndAddUserWithAcceptedConfirm() {
+        userRepository.deleteAll();
+        User user = new User(
+                "maksim@mail.com",
+                bCryptPasswordEncoder.encode("12345"),
+                null,
+                List.of("ROLE_USER")
+        );
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }

@@ -9,3 +9,6 @@ spring:
     type: none
     redis:
       time-to-live: PT10S
+auth:
+  jwt:
+    expirationMinutes: 99999999

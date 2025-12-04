@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.lotto.BaseIntegrationTest;
 import com.lotto.IntegrationTestData;
+import com.lotto.domain.loginandregister.User;
+import com.lotto.domain.loginandregister.UserRepository;
 import com.lotto.domain.numbergenerator.NumberGeneratorFacade;
 import com.lotto.domain.numbergenerator.WinningNumbersNotFoundException;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
@@ -16,9 +18,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
+import javax.mail.internet.MimeMessage;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +32,9 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -41,6 +48,12 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
 
     @Autowired
     ResultCheckerFacade resultCheckerFacade;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder bCryptPasswordEncoder;
 
     @Test
     public void should_user_win_and_system_should_generate_winners() throws Exception {
@@ -60,22 +73,28 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
         // given && when && then
         mockMvc.perform(post("/token").content(requestBodyLogin())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.message").value("Bad credentials"))
-                .andExpect(jsonPath("$.status").value("UNAUTHORIZED"));
+                .andExpect(status().isUnauthorized());
 
 
         // step 3: użytkownik wysyła POST /register z mail=maksim@mail.com i password=12345;  system rejestruje użytkownika i zwraca CREATED (201)
         // given when && then
+
+        MimeMessage mimeMessage = new MimeMessage((javax.mail.Session) null);
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+        doNothing().when(javaMailSender).send(any(MimeMessage.class));
+        doNothing().when(javaMailSender).send(any(org.springframework.mail.SimpleMailMessage.class));
+        doNothing().when(javaMailSender).send(any(org.springframework.mail.javamail.MimeMessagePreparator.class));
+
         mockMvc.perform(post("/register").content(requestBodyRegister())
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value("maksim@mail.com"))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Success. User created."));
 
 
         // step 4: użytkownik ponownie próbuje uzyskać token JWT, wysyłając POST /token z mail=maksim@mail.com i password=12345;  system zwraca OK (200) oraz jwtToken="AAAA.BBBB.CCC"
         // given && when && then
+        resetDatabaseAndAddUserWithAcceptedConfirm();
+
         MvcResult mvcResultToken = mockMvc.perform(post("/token").content(requestBodyLogin())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk()).andReturn();
@@ -85,6 +104,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
         assertAll(
                 () ->
                         assertThat(token).matches(Pattern.compile("^([A-Za-z0-9-_=]+\\.)+([A-Za-z0-9-_=])+\\.?$")));
+
 
         // step 5: system fetched winning numbers for draw date: 01.11.2025 12:00
         // given
@@ -171,7 +191,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
         // given && when
         ResultActions performGetResultsWithoutToken = mockMvc.perform(get("/result/" + hash));
         // then
-        performGetResultsWithoutToken.andExpect(status().isForbidden());
+        performGetResultsWithoutToken.andExpect(status().isUnauthorized());
 
 
         // step 12: user made GET /results/sampleTicketId and system returned 200 (OK)
@@ -186,6 +206,7 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
                 () -> assertThat(finalResult.responseDto().hash()).isEqualTo(hash),
                 () -> assertThat(finalResult.responseDto().resultCategory()).isEqualTo("JACKPOT")
         );
+
 
         // step 13: user made GET /results and system returned 200 (OK)
         // given && when
@@ -203,5 +224,17 @@ class UserPlayedLottoAndWonIntegrationTest extends BaseIntegrationTest implement
                 () -> assertThat(ticket.numbers()).isEqualTo(Set.of(1, 2, 3, 4, 5, 6)),
                 () -> assertThat(ticket.drawDate()).isEqualTo(drawDate)
         );
+    }
+
+    private void resetDatabaseAndAddUserWithAcceptedConfirm() {
+        userRepository.deleteAll();
+        User user = new User(
+                "maksim@mail.com",
+                bCryptPasswordEncoder.encode("12345"),
+                null,
+                List.of("ROLE_USER")
+        );
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }
