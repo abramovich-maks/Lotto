@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.UserDetailsManager;
 
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.stream.Collectors;
 public class UserDetailsService implements UserDetailsManager {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserConformer userConformer;
 
 
@@ -32,9 +30,8 @@ public class UserDetailsService implements UserDetailsManager {
     public void createUser(final UserDetails user) {
         if (userExists(user.getUsername())) {
             log.warn("User with username: {} already exists", user.getUsername());
-            throw new RuntimeException("not saved user - already exists");
+            throw new UserAlreadyExistException(user.getUsername());
         }
-        String encodedPassword = passwordEncoder.encode(user.getPassword());
         String confirmationToken = UUID.randomUUID().toString();
         List<String> authorities = user.getAuthorities()
                 .stream()
@@ -42,7 +39,7 @@ public class UserDetailsService implements UserDetailsManager {
                 .collect(Collectors.toList());
         User createdUser = new User(
                 user.getUsername(),
-                encodedPassword,
+                user.getPassword(),
                 confirmationToken,
                 authorities
         );
