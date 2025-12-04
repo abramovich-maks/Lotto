@@ -17,6 +17,8 @@ import org.springframework.security.provisioning.UserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Configuration
 @AllArgsConstructor
 class SecurityConfig {
@@ -28,7 +30,7 @@ class SecurityConfig {
 
     @Bean
     public UserDetailsManager userDetailsService(UserRepository userRepository, UserConformer userConformer) {
-        return new UserDetailsService(userRepository, passwordEncoder(), userConformer);
+        return new UserDetailsService(userRepository, userConformer);
     }
 
     @Bean
@@ -49,7 +51,13 @@ class SecurityConfig {
                 .and().httpBasic().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .exceptionHandling();
+                .exceptionHandling()
+                .authenticationEntryPoint((request, response, authException) ->
+                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                .accessDeniedHandler((request, response, accessDeniedException) ->
+                        response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied"))
+                .and()
+                .headers().frameOptions().disable();
         return httpSecurity.build();
     }
 
