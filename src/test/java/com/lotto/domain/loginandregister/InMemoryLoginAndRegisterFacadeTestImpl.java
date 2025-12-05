@@ -26,15 +26,10 @@ class InMemoryLoginAndRegisterFacadeTestImpl implements UserRepository {
 
     @Override
     public <S extends User> S save(final S entity) {
-        UUID id = UUID.randomUUID();
-        User user = new User(
-                id.toString(),
-                entity.getEmail(),
-                entity.getPassword(),
-                entity.getAuthorities()
-        );
-        inMemoryDatabase.put(user.getEmail(), user);
-        return (S) user;
+        String id = UUID.randomUUID().toString();
+        entity.setUserId(id);
+        inMemoryDatabase.put(entity.getEmail(), entity);
+        return entity;
     }
 
     @Override

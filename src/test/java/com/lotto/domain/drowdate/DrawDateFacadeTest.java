@@ -15,7 +15,7 @@ class DrawDateFacadeTest {
     ZonedDateTime zonedDateTime = ZonedDateTime.of(2025, 10, 23, 12, 0, 0, 0, POLAND);
     AdjustableClock clock = new AdjustableClock(zonedDateTime.toInstant(), POLAND);
 
-    DrawDateFacade drawDateFacade = new DrawDateConfiguration().drawDateFacadeForTest(clock);
+    DrawDateFacade drawDateFacade = new DrawDateFacade(new DrawDateGeneratorTestImpl(clock));
 
     @Test
     public void should_return_correct_draw_date() {
