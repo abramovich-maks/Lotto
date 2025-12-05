@@ -11,4 +11,9 @@ class LoginAndRegisterConfiguration {
         UserRetriever userRetriever = new UserRetriever(userRepository);
         return new LoginAndRegisterFacade(userRetriever);
     }
+
+    @Bean
+    public static UserDetailsService userDetailsService(UserRepository userRepository, UserConformer userConformer) {
+        return new UserDetailsService(userRepository, userConformer);
+    }
 }
