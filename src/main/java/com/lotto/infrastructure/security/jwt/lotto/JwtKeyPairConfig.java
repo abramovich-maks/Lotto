@@ -22,23 +22,23 @@ class JwtKeyPairConfig {
         keyPairGenerator.initialize(2048);
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
         // Save public key to file
-        saveKeyToFile("public_key.pem", keyPair.getPublic().getEncoded(), true);
-        // Save private key to file
-        saveKeyToFile("private_key.pem", keyPair.getPrivate().getEncoded(), false);
+//        saveKeyToFile("public_key.pem", keyPair.getPublic().getEncoded(), true);
+//        // Save private key to file
+//        saveKeyToFile("private_key.pem", keyPair.getPrivate().getEncoded(), false);
         return keyPair;
     }
 
-    private void saveKeyToFile(String fileName, byte[] keyBytes, boolean isPublicKey) throws IOException {
-        try (FileOutputStream fos = new FileOutputStream(Paths.get("src", "main", "resources", fileName).toString())) {
-            fos.write(getPemEncoded(keyBytes, isPublicKey));
-        }
-    }
+//    private void saveKeyToFile(String fileName, byte[] keyBytes, boolean isPublicKey) throws IOException {
+//        try (FileOutputStream fos = new FileOutputStream(Paths.get("src", "main", "resources", fileName).toString())) {
+//            fos.write(getPemEncoded(keyBytes, isPublicKey));
+//        }
+//    }
 
-    private byte[] getPemEncoded(byte[] keyBytes, boolean isPublicKey) {
-        String pemHeader = isPublicKey ? "-----BEGIN PUBLIC KEY-----\n" : "-----BEGIN PRIVATE KEY-----\n";
-        String pemFooter = isPublicKey ? "\n-----END PUBLIC KEY-----\n" : "\n-----END PRIVATE KEY-----\n";
-        String pemEncoded = pemHeader + Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyBytes) + pemFooter;
-        return pemEncoded.getBytes();
-    }
+//    private byte[] getPemEncoded(byte[] keyBytes, boolean isPublicKey) {
+//        String pemHeader = isPublicKey ? "-----BEGIN PUBLIC KEY-----\n" : "-----BEGIN PRIVATE KEY-----\n";
+//        String pemFooter = isPublicKey ? "\n-----END PUBLIC KEY-----\n" : "\n-----END PRIVATE KEY-----\n";
+//        String pemEncoded = pemHeader + Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(keyBytes) + pemFooter;
+//        return pemEncoded.getBytes();
+//    }
 
 }
