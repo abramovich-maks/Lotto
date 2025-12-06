@@ -2,6 +2,7 @@ package com.lotto.infrastructure.security.jwt.lotto;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import lombok.RequiredArgsConstructor;
@@ -32,10 +33,8 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = getTokenFromRequest(request);
-        if (token == null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        if (token != null) {
+            try {
         JWTVerifier jwtVerifier = JWT.require(Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), null))
                 .build();
         DecodedJWT decodedToken = jwtVerifier.verify(token);
@@ -47,6 +46,16 @@ public class JwtAuthTokenFilter extends OncePerRequestFilter {
                 .toList();
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(login, null, roles);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+
+            } catch (JWTVerificationException ex) {
+                log.warn("Invalid or expired JWT token: {}", ex.getMessage());
+                SecurityContextHolder.clearContext();
+            } catch (Exception ex) {
+                log.error("Unexpected error while verifying JWT: {}", ex.getMessage(), ex);
+                SecurityContextHolder.clearContext();
+            }
+        }
+
         filterChain.doFilter(request, response);
     }
 

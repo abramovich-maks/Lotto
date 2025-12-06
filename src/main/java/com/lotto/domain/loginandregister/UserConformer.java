@@ -28,7 +28,8 @@ public class UserConformer {
             String name = user.getEmail();
             String token = user.getConfirmationToken();
 
-            String confirmUrl = "https://localhost:8080/confirm?token=" + token;
+//            String confirmUrl = "https://localhost:8080/confirm?token=" + token;
+            String confirmUrl = "https://ec2-3-122-255-213.eu-central-1.compute.amazonaws.com:8000/confirm?token=" + token;
 
             Context ctx = new Context();
             ctx.setVariable("name", name);

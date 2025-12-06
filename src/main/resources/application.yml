@@ -25,6 +25,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+  config:
+    import: "optional:aws-secretsmanager:secret-lotto"
 
 lotto:
   number-generator:
@@ -45,7 +47,7 @@ lotto:
 
 auth:
   jwt:
-    expirationMinutes: 10
+    expirationMinutes: 60
     secret: ${JWT_SECRET}
     issuer: lotto-backend
 

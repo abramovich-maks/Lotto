@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.provisioning.UserDetailsManager;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -18,6 +20,18 @@ public class UserDetailsService implements UserDetailsManager {
     private final UserRepository userRepository;
     private final UserConformer userConformer;
 
+    public boolean isIsLoggedIn(final HttpServletRequest request) {
+        boolean isLoggedIn = false;
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("accessToken".equals(cookie.getName())) {
+                    isLoggedIn = true;
+                }
+            }
+        }
+        return isLoggedIn;
+    }
 
     @Override
     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
