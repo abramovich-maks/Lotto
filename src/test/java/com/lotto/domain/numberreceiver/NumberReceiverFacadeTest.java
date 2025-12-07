@@ -32,7 +32,7 @@ class NumberReceiverFacadeTest {
     @Test
     public void should_return_success_when_user_gave_six_unique_numbers_in_range() {
         // given
-        initializeMockUser();
+        initializeMockUser("user-1");
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
@@ -45,7 +45,7 @@ class NumberReceiverFacadeTest {
     @WithMockUser()
     public void should_return_save_to_database_when_user_gave_six_unique_numbers_in_range() {
         // given
-        initializeMockUser();
+        initializeMockUser("user-1");
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
@@ -95,7 +95,7 @@ class NumberReceiverFacadeTest {
     @Test
     void should_return_next_saturday_if_now_is_exactly_12() {
         // given
-        initializeMockUser();
+        initializeMockUser("user-1");
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
@@ -107,7 +107,7 @@ class NumberReceiverFacadeTest {
     @Test
     void should_store_multiple_tickets_for_same_draw_date() {
         // given
-        initializeMockUser();
+        initializeMockUser("user-1");
         Set<Integer> numbers1 = Set.of(1, 2, 3, 4, 5, 6);
         Set<Integer> numbers2 = Set.of(7, 8, 9, 10, 11, 12);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
@@ -136,37 +136,53 @@ class NumberReceiverFacadeTest {
     }
 
     @Test
-    public void should_return_all_tickets_by_login_user() {
-        initializeMockUser();
-        Set<Integer> numbersForTicketOne = Set.of(1, 2, 3, 4, 5, 6);
-        Set<Integer> numbersForTicketTwo = Set.of(10, 20, 30, 40, 50, 60);
-        Set<Integer> numbersForTicketThree = Set.of(19, 29, 39, 49, 59, 69);
+    public void should_return_all_tickets_for_different_users_separately() {
+        // User 1
+        // given
+        initializeMockUser("user-1");
+        Set<Integer> ticketNumbersUser1_1 = Set.of(1, 2, 3, 4, 5, 6);
+        Set<Integer> ticketNumbersUser1_2 = Set.of(10, 20, 30, 40, 50, 60);
+        Set<Integer> ticketNumbersUser1_3 = Set.of(19, 29, 39, 49, 59, 69);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
-
-        InputNumberResultDto result1 = numberReceiverFacade.inputNumbers(numbersForTicketOne);
-        InputNumberResultDto result2 = numberReceiverFacade.inputNumbers(numbersForTicketTwo);
-        InputNumberResultDto result3 = numberReceiverFacade.inputNumbers(numbersForTicketThree);
-
-        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
-
-        assertThat(ticketDtos).hasSize(3);
-        assertThat(ticketDtos)
+        // when
+        InputNumberResultDto user1Result1 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_1);
+        InputNumberResultDto user1Result2 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_2);
+        InputNumberResultDto user1Result3 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_3);
+        // then
+        List<TicketDto> ticketsUser1 = numberReceiverFacade.retrieveAllTicketsByUsername("user-1");
+        assertThat(ticketsUser1).hasSize(3);
+        assertThat(ticketsUser1)
                 .extracting(TicketDto::hash)
                 .containsExactlyInAnyOrder(
-                        result1.ticketDto().hash(),
-                        result2.ticketDto().hash(),
-                        result3.ticketDto().hash()
+                        user1Result1.ticketDto().hash(),
+                        user1Result2.ticketDto().hash(),
+                        user1Result3.ticketDto().hash()
+                );
+        // User 2
+        // given
+        initializeMockUser("user-2");
+        Set<Integer> ticketNumbersUser2_1 = Set.of(1, 2, 3, 4, 5, 6);
+        when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
+        // when
+        InputNumberResultDto user2Result1 = numberReceiverFacade.inputNumbers(ticketNumbersUser2_1);
+        // then
+        List<TicketDto> ticketsUser2 = numberReceiverFacade.retrieveAllTicketsByUsername("user-2");
+        assertThat(ticketsUser2).hasSize(1);
+        assertThat(ticketsUser2)
+                .extracting(TicketDto::hash)
+                .containsExactlyInAnyOrder(
+                        user2Result1.ticketDto().hash()
                 );
     }
 
-    private static void initializeMockUser() {
-        User mockUser = new User("test-user-id", "username", "password",Set.of("role"));
+    private void initializeMockUser(String userEmail) {
+        User mockUser = new User(userEmail, "password", "token", Set.of("role"));
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(mockUser);
-        when(authentication.getName()).thenReturn("username");
+        when(authentication.getName()).thenReturn(userEmail);
         SecurityContextHolder.setContext(securityContext);
     }
 }

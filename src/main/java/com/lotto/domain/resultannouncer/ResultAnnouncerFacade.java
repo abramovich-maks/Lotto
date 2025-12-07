@@ -8,6 +8,7 @@ import com.lotto.domain.resultchecker.ResultCheckerFacade;
 import com.lotto.domain.resultchecker.dto.TicketResultDto;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
@@ -56,9 +57,9 @@ public class ResultAnnouncerFacade {
                 .build();
     }
 
-    @Cacheable(value = "listTickets")
     public List<TicketListByUser> createListAllTicketByUser() {
-        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername();
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername(currentUser);
         return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
                 .hash(ticketDto.hash())
                 .numbers(ticketDto.numbers())

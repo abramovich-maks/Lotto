@@ -4,6 +4,7 @@ import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
@@ -47,8 +48,8 @@ public class NumberReceiverFacade {
                 .toList();
     }
 
-    public List<TicketDto> retrieveAllTicketsByUsername() {
-        String userName = getCurrentUser();
+    @Cacheable(value = "listTickets", key = "#userName")
+    public List<TicketDto> retrieveAllTicketsByUsername(String userName) {
         return repository.findAllTicketsByUserName(userName)
                 .stream()
                 .map(TicketMapper::mapFromTicket)
