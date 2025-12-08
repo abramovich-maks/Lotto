@@ -27,6 +27,20 @@ public class ResultAnnouncerFacade {
 
     @Cacheable(value = "resultAnnounce")
     public ResultAnnouncerResponseDto checkResult(String hash) {
+        return processTicket(hash);
+    }
+
+    public List<TicketListByUser> createListAllTicketByUser() {
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername(currentUser);
+        return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
+                .hash(ticketDto.hash())
+                .numbers(ticketDto.numbers())
+                .drawDate(ticketDto.drawDate())
+                .build()).toList();
+    }
+
+    private ResultAnnouncerResponseDto processTicket(String hash) {
         if (hash == null || hash.isBlank()) {
             return ResultAnnouncerResponseDto.builder()
                     .responseDto(null)
@@ -55,16 +69,6 @@ public class ResultAnnouncerFacade {
                 .responseDto(responseDto)
                 .message("Result available")
                 .build();
-    }
-
-    public List<TicketListByUser> createListAllTicketByUser() {
-        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByUsername(currentUser);
-        return ticketDtos.stream().map(ticketDto -> TicketListByUser.builder()
-                .hash(ticketDto.hash())
-                .numbers(ticketDto.numbers())
-                .drawDate(ticketDto.drawDate())
-                .build()).toList();
     }
 
     private static ResultResponse buildResponse(ResponseDto responseDto, LocalDateTime now) {
