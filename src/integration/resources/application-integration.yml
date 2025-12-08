@@ -9,6 +9,10 @@ spring:
     type: none
     redis:
       time-to-live: PT10S
+  data:
+    redis:
+      host: localhost
+      port: 63792
 auth:
   jwt:
     expirationMinutes: 99999999
