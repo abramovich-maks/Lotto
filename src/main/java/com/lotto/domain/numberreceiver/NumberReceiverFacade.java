@@ -4,6 +4,7 @@ import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -20,7 +21,8 @@ public class NumberReceiverFacade {
     private final TicketRepository repository;
     private final DrawDateFacade drawDateFacade;
 
-    public InputNumberResultDto inputNumbers(Set<Integer> numbersFromUser) {
+    @CacheEvict(value = "listTickets", key = "#userName")
+    public InputNumberResultDto inputNumbers(String userName, Set<Integer> numbersFromUser) {
         boolean areAllNumbersInRange = validator.areAllNumbersInRange(numbersFromUser);
         if (!areAllNumbersInRange) {
             return InputNumberResultDto.builder()
@@ -29,7 +31,7 @@ public class NumberReceiverFacade {
         }
         String hashTicket = hashGenerator.getHash();
         LocalDateTime drawDate = drawDateFacade.getNextDrawDate();
-        String userName = getCurrentUser();
+
         Ticket savedTicket = repository.save(new Ticket(hashTicket, numbersFromUser, drawDate, userName));
         return InputNumberResultDto.builder()
                 .ticketDto(TicketMapper.mapFromTicket(savedTicket))
@@ -58,11 +60,5 @@ public class NumberReceiverFacade {
 
     public LocalDateTime retrieveNextDrawDate() {
         return drawDateFacade.getNextDrawDate();
-    }
-
-    private String getCurrentUser() {
-        return SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
     }
 }

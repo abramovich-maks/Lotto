@@ -4,6 +4,7 @@ import com.lotto.domain.numberreceiver.NumberReceiverFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,10 @@ class InputNumbersRestController {
     @PostMapping("/inputNumbers")
     public ResponseEntity<InputNumberResultDto> inputNumbers(@RequestBody @Valid InputNumbersRequestDto dto) {
         Set<Integer> collect = new HashSet<>(dto.inputNumbers());
-        InputNumberResultDto inputNumberResultDto = numberReceiverFacade.inputNumbers(collect);
+        String userName = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
+        InputNumberResultDto inputNumberResultDto = numberReceiverFacade.inputNumbers(userName, collect);
         return ResponseEntity.ok(inputNumberResultDto);
     }
 }
