@@ -32,7 +32,7 @@ class JwtTokenController {
         String token = tokenGenerator.authenticateAndGenerateToken(dto.login(), dto.password());
         Cookie cookie = new Cookie("accessToken", token);
         cookie.setHttpOnly(true);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60);
         response.addCookie(cookie);
