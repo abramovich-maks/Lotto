@@ -36,7 +36,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         // then
         assertThat(result.message()).isEqualTo("success");
     }
@@ -48,7 +48,7 @@ class NumberReceiverFacadeTest {
         initializeMockUser("user-1");
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         LocalDateTime drowDate = LocalDateTime.of(2025, 10, 25, 12, 0, 0);
         // when
         List<TicketDto> ticketDtos = numberReceiverFacade.retrieveAllTicketsByDrawDate(drowDate);
@@ -67,7 +67,7 @@ class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 2, 5, 6);
         // when
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         // then
         assertThat(result.message()).isEqualTo("failed");
     }
@@ -77,7 +77,7 @@ class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
         // when
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         // then
         assertThat(result.message()).isEqualTo("failed");
     }
@@ -87,7 +87,7 @@ class NumberReceiverFacadeTest {
         // given
         Set<Integer> numbersFromUser = Set.of(1, 200, 3, 4, 5, 6);
         // when
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         // then
         assertThat(result.message()).isEqualTo("failed");
     }
@@ -99,7 +99,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> numbersFromUser = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
-        InputNumberResultDto result = numberReceiverFacade.inputNumbers(numbersFromUser);
+        InputNumberResultDto result = numberReceiverFacade.inputNumbers("user-1",numbersFromUser);
         // then
         assertThat(result.ticketDto().drawDate()).isEqualTo(LocalDateTime.of(2025, 10, 25, 12, 0));
     }
@@ -108,19 +108,19 @@ class NumberReceiverFacadeTest {
     void should_store_multiple_tickets_for_same_draw_date() {
         // given
         initializeMockUser("user-1");
-        Set<Integer> numbers1 = Set.of(1, 2, 3, 4, 5, 6);
-        Set<Integer> numbers2 = Set.of(7, 8, 9, 10, 11, 12);
+        Set<Integer> numbersFromUser1 = Set.of(1, 2, 3, 4, 5, 6);
+        Set<Integer> numbersFromUser2 = Set.of(7, 8, 9, 10, 11, 12);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
-        InputNumberResultDto r1 = numberReceiverFacade.inputNumbers(numbers1);
-        InputNumberResultDto r2 = numberReceiverFacade.inputNumbers(numbers2);
-        LocalDateTime drawDate = r1.ticketDto().drawDate();
+        InputNumberResultDto result1 = numberReceiverFacade.inputNumbers("user-1",numbersFromUser1);
+        InputNumberResultDto result2 = numberReceiverFacade.inputNumbers("user-2",numbersFromUser2);
+        LocalDateTime drawDate = result1.ticketDto().drawDate();
         List<TicketDto> tickets = numberReceiverFacade.retrieveAllTicketsByDrawDate(drawDate);
 
         // then
         assertThat(tickets).hasSize(2);
         assertThat(tickets).extracting(TicketDto::hash)
-                .containsExactlyInAnyOrder(r1.ticketDto().hash(), r2.ticketDto().hash());
+                .containsExactlyInAnyOrder(result1.ticketDto().hash(), result2.ticketDto().hash());
 
     }
 
@@ -145,9 +145,9 @@ class NumberReceiverFacadeTest {
         Set<Integer> ticketNumbersUser1_3 = Set.of(19, 29, 39, 49, 59, 69);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
-        InputNumberResultDto user1Result1 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_1);
-        InputNumberResultDto user1Result2 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_2);
-        InputNumberResultDto user1Result3 = numberReceiverFacade.inputNumbers(ticketNumbersUser1_3);
+        InputNumberResultDto user1Result1 = numberReceiverFacade.inputNumbers("user-1",ticketNumbersUser1_1);
+        InputNumberResultDto user1Result2 = numberReceiverFacade.inputNumbers("user-1",ticketNumbersUser1_2);
+        InputNumberResultDto user1Result3 = numberReceiverFacade.inputNumbers("user-1",ticketNumbersUser1_3);
         // then
         List<TicketDto> ticketsUser1 = numberReceiverFacade.retrieveAllTicketsByUsername("user-1");
         assertThat(ticketsUser1).hasSize(3);
@@ -164,7 +164,7 @@ class NumberReceiverFacadeTest {
         Set<Integer> ticketNumbersUser2_1 = Set.of(1, 2, 3, 4, 5, 6);
         when(drawDateFacade.getNextDrawDate()).thenReturn(LocalDateTime.of(2025, 10, 25, 12, 0, 0));
         // when
-        InputNumberResultDto user2Result1 = numberReceiverFacade.inputNumbers(ticketNumbersUser2_1);
+        InputNumberResultDto user2Result1 = numberReceiverFacade.inputNumbers("user-2",ticketNumbersUser2_1);
         // then
         List<TicketDto> ticketsUser2 = numberReceiverFacade.retrieveAllTicketsByUsername("user-2");
         assertThat(ticketsUser2).hasSize(1);

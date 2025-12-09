@@ -39,6 +39,11 @@ class InMemoryTicketRepositoryTestImpl implements TicketRepository {
     }
 
     @Override
+    public Optional<Ticket> findByHash(final String hash) {
+        return Optional.ofNullable(inMemoryDatabase.get(hash));
+    }
+
+    @Override
     public <S extends Ticket> List<S> saveAll(final Iterable<S> entities) {
         return List.of();
     }
