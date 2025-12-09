@@ -4,12 +4,16 @@ import com.lotto.domain.AdjustableClock;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DrawDateFacadeTest {
 
-    AdjustableClock clock = new DrawDateConfiguration().clock();
+    private static final ZoneId POLAND = ZoneId.of("Europe/Warsaw");
+    ZonedDateTime zonedDateTime = ZonedDateTime.of(2025, 10, 23, 12, 0, 0, 0, POLAND);
+    AdjustableClock clock = new AdjustableClock(zonedDateTime.toInstant(), POLAND);
     DrawDateFacade drawDateFacade = new DrawDateConfiguration().drawDateFacadeForTest(clock);
 
     @Test
