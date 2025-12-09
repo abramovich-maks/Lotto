@@ -1,6 +1,7 @@
 package com.lotto.domain.resultannouncer;
 
 import com.lotto.domain.numberreceiver.NumberReceiverFacade;
+import com.lotto.domain.numberreceiver.dto.TicketIsExistDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.lotto.domain.resultannouncer.ResultMapper.mapFromResultResponseToResponseDto;
+import static java.lang.String.format;
 
 @AllArgsConstructor
 public class ResultAnnouncerFacade {
@@ -47,6 +49,12 @@ public class ResultAnnouncerFacade {
                     .message("Invalid hash")
                     .build();
         }
+        if (numberReceiverFacade.existsByHash(hash)) {
+            TicketIsExistDto byHash = numberReceiverFacade.findByHash(hash);
+            if (byHash.drawDate().isAfter(LocalDateTime.now())) {
+                return new ResultAnnouncerResponseDto(null, format("Ticket with hash %s has not been drawn yet. Draw date is %s", hash, byHash.drawDate()));
+            }
+        }
         if (announcerRepository.existsById(hash)) {
             Optional<ResultResponse> resultResponseCached = announcerRepository.findById(hash);
             if (resultResponseCached.isPresent()) {
@@ -62,9 +70,6 @@ public class ResultAnnouncerFacade {
         }
         ResponseDto responseDto = buildResponseDto(byTicketId);
         announcerRepository.save(buildResponse(responseDto, LocalDateTime.now(clock)));
-        if (announcerRepository.existsById(hash) && !isAfterResultAnnouncementTime(byTicketId)) {
-            return new ResultAnnouncerResponseDto(responseDto, "Result not announced yet");
-        }
         return ResultAnnouncerResponseDto.builder()
                 .responseDto(responseDto)
                 .message("Result available")
@@ -93,10 +98,5 @@ public class ResultAnnouncerFacade {
                 .matchedNumbers(resultDto.matchedNumbers())
                 .resultCategory(resultDto.resultCategory())
                 .build();
-    }
-
-    private boolean isAfterResultAnnouncementTime(TicketResultDto resultDto) {
-        LocalDateTime announcementDateTime = resultDto.drawDate();
-        return LocalDateTime.now(clock).isAfter(announcementDateTime);
     }
 }

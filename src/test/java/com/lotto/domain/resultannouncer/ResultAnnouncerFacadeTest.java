@@ -1,6 +1,8 @@
 package com.lotto.domain.resultannouncer;
 
+import com.lotto.domain.AdjustableClock;
 import com.lotto.domain.numberreceiver.NumberReceiverFacade;
+import com.lotto.domain.numberreceiver.dto.TicketIsExistDto;
 import com.lotto.domain.resultannouncer.dto.ResponseDto;
 import com.lotto.domain.resultannouncer.dto.ResultAnnouncerResponseDto;
 import com.lotto.domain.resultchecker.ResultCheckerFacade;
@@ -9,6 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +30,10 @@ class ResultAnnouncerFacadeTest {
             numberReceiverFacade,
             Clock.systemUTC()
     );
+
+    private static final ZoneId POLAND = ZoneId.of("Europe/Warsaw");
+    ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
+    AdjustableClock adjustableClock = new AdjustableClock(zonedDateTime.toInstant(), POLAND);
 
     @Test
     public void should_return_response_when_hash_is_null_or_blank() {
@@ -180,5 +188,29 @@ class ResultAnnouncerFacadeTest {
         assertThat(r4.responseDto().resultCategory()).isEqualTo("FOUR_MATCH");
         assertThat(r5.responseDto().resultCategory()).isEqualTo("FIVE_MATCH");
         assertThat(r6.responseDto().resultCategory()).isEqualTo("JACKPOT");
+    }
+
+    @Test
+    public void should_return_response_when_chek_ticket_after_drow_date() {
+        // given
+        LocalDateTime drawDate = LocalDateTime.now(adjustableClock).plusDays(1);
+        String hash = "hash-111";
+
+        TicketResultDto resultDto = TicketResultDto.builder()
+                .hash(hash)
+                .drawDate(drawDate)
+                .build();
+
+        TicketIsExistDto ticketIsExistDto = TicketIsExistDto.builder()
+                .hash(resultDto.hash())
+                .drawDate(resultDto.drawDate())
+                .build();
+        when(numberReceiverFacade.existsByHash(hash)).thenReturn(true);
+        when(numberReceiverFacade.findByHash(hash)).thenReturn(ticketIsExistDto);
+        // when
+        ResultAnnouncerResponseDto resultIsAfterDrowDate = resultAnnouncerFacade.checkResult(hash);
+        // then
+        assertThat(resultIsAfterDrowDate.message()).isEqualTo("Ticket with hash hash-111 has not been drawn yet. Draw date is " + drawDate);
+        assertThat(resultIsAfterDrowDate.responseDto()).isNull();
     }
 }
