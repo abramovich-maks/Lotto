@@ -3,10 +3,10 @@ package com.lotto.domain.numberreceiver;
 import com.lotto.domain.drowdate.DrawDateFacade;
 import com.lotto.domain.numberreceiver.dto.InputNumberResultDto;
 import com.lotto.domain.numberreceiver.dto.TicketDto;
+import com.lotto.domain.numberreceiver.dto.TicketIsExistDto;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -60,5 +60,18 @@ public class NumberReceiverFacade {
 
     public LocalDateTime retrieveNextDrawDate() {
         return drawDateFacade.getNextDrawDate();
+    }
+
+    public boolean existsByHash(final String hash) {
+        return repository.existsById(hash);
+    }
+
+    public TicketIsExistDto findByHash(final String hash) {
+        Ticket byId = repository.findByHash(hash)
+                .orElseThrow();
+        return TicketIsExistDto.builder()
+                .hash(byId.hash())
+                .drawDate(byId.drawDate())
+                .build();
     }
 }
