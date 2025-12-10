@@ -18,9 +18,9 @@ public class RegisterWebController {
     public String confirm(@RequestParam String token) {
         boolean isConfirmed = userConformer.confirmUser(token);
         if (isConfirmed) {
-            return "redirect:http://localhost:3000/login";
+            return "redirect:https://ec2-3-122-255-213.eu-central-1.compute.amazonaws.com/login";
         } else {
-            return "redirect:http://localhost:3000/register";
+            return "redirect:https://ec2-3-122-255-213.eu-central-1.compute.amazonaws.com/register";
         }
     }
 }
